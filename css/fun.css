@@ -2,6 +2,7 @@
 body {
     margin: 60px auto;
     width: 70%;
+    background-image: linear-gradient(90deg, rgb(217, 198, 252),rgb(82, 114, 237));
 }
 nav ul, footer ul {
     font-family:'Helvetica', 'Arial', 'Sans-Serif';
@@ -44,4 +45,4 @@ ul.posts li {
 }
 
 
-background-image: linear-gradient(90deg, rgb(217, 198, 252),rgb(82, 114, 237));
+
