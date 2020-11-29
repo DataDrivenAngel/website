@@ -6,22 +6,20 @@
     <title>Virtual Advent Calendar</title>
     <link rel="stylesheet" type="text/css" href="christmas.css">
 </head>
+
 <script language="javascript">
     function changeImage(id,src) {
         const doc = document.querySelector(("#"+id))
-        console.log("id:",id);
-        console.log("src:" ,src);
-        console.log("alt_src:",doc.dataset.alt_src);
+        // console.log("id:",id);
+        // console.log("src:" ,src.slice(-7));
+        // console.log("alt_src:",doc.dataset.alt_src);
 
-        if (document.getElementById(id).src == "icons/png/000.png") 
+        if (document.getElementById(id).src.slice(-7) == "000.png") 
         {
             document.getElementById(id).src =
-            document.doc.dataset.alt_src ;
+            doc.dataset.alt_src ;
         }
-        else 
-        {
-            document.getElementById("imgClickAndChange").src = document.getElementById("imgClickAndChange").src;
-        }
+
     }
 </script>
 
@@ -42,8 +40,11 @@
             alt="Day 1: a christmas card with a tree on it" onclick="changeImage(id,src)">
         </figure>
         <figure class="item" >
-            <img id = 2 src="icons/png/009-bauble-1.png" class="gallery__img" alt="Day 2: a christmas tree ornament"
-            onclick="changeImage(id)">
+            <img id = 2 
+            src="icons/png/000.png"
+            data-alt_src="icons/png/009-bauble-1.png"
+            class="gallery__img" alt="Day 2: a christmas tree ornament"
+            onclick="changeImage(id,src)">
         </figure>
     </div>
     <div>
