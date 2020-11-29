@@ -1,0 +1,38 @@
+body {
+    margin: 60px auto;
+    width: 95%; 
+    background-color: #E5E5F7;
+    opacity: 1;
+    background-image: linear-gradient(to right, #D6001C, #65D60B 10px, #65D60B 10px, #D6001C );
+    background-size: 20px 100%; 
+}
+
+h1 {
+    font: size 10em;
+    color: black;
+    background-color: grey;
+    padding: 10px;
+    margin-left: 0%;
+    width: 200px;
+    border-radius: 15px;
+    text-shadow: 2px ;
+    box-shadow: 2px 2px 1px black;
+      }
+
+img {
+    height: 100%;
+    width: 100%;
+    border-radius: 15px;
+  }
+
+
+grid-container {
+    display: grid;
+    grid-template-rows: 80px 200px;
+  }
+
+  h3 {
+    font: size 8em;
+    border-radius: 15px;
+    text-shadow: 2px 2px violet;
+      }
