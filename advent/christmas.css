@@ -42,7 +42,17 @@ div.calendar {
   object-fit: cover;
   background-color: white;
   border-radius: 10px;
-  /* outline-style: inset; */
+  
+  box-shadow: 2px 2px 2px black;
+  opacity: .1;
+}
+
+.item_clicked {
+  width: 106px;
+  height: 106px;
+  object-fit: cover;
+  background-color: white;
+  border-radius: 10px;
   
   box-shadow: 2px 2px 2px black;
   opacity: 1;
