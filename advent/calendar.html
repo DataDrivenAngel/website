@@ -34,20 +34,27 @@
         <h4>click on the numbers to open the advent calendar boxes</h4>
     </div>
     <div class = "calendar">
-        <figure>
-            <img 
-            class="item"
-            id = "d1" 
-            src="icons/png/000.png"
-            data-alt_src="icons/png/003-christmas-card.png" 
-            alt="Day 1: a christmas card with a tree on it" onclick="changeImage(id,src)">
+        <figure onclick="changeImage(id,src)">
+            <div >
+                <img class="item"
+                    id = "d1" 
+                    src="icons/png/000.png"
+                    data-alt_src="icons/png/003-christmas-card.png" 
+                    alt="Day 1: a christmas card with a tree on it"
+                    
+                    onclick="changeImage(id,src)">
+                <div class="text">1</div>
+            </div>
+            
+            
         </figure>
 
-        <figure class="item" >
-            <img id = "d2" 
+        <figure  >
+            <img class="item"
+            id = "d2" 
             src="icons/png/000.png"
             data-alt_src="icons/png/009-bauble-1.png"
-            class="gallery__img" alt="Day 2: a christmas tree ornament"
+            alt="Day 2: a christmas tree ornament"
             onclick="changeImage(id,src)">
         </figure>
     </div>

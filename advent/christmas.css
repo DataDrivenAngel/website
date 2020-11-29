@@ -42,9 +42,21 @@ div.calendar {
   object-fit: cover;
   background-color: white;
   border-radius: 10px;
-  
   box-shadow: 2px 2px 2px black;
   opacity: .1;
+}
+ .text {
+  position: relative;
+  top: -106px;
+  left: 24px;
+  opacity: 0;
+  font-size: 80px;
+}
+.item:hover {
+  opacity: .2;
+}
+ .text:hover {
+  opacity: .8
 }
 
 .item_clicked {
@@ -55,7 +67,12 @@ div.calendar {
   border-radius: 10px;
   
   box-shadow: 2px 2px 2px black;
-  opacity: 1;
+  opacity: 0.88;
+}
+
+.center_text {
+  top: 50%;
+  left: 50%;
 }
 
 
