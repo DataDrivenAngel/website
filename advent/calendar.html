@@ -1,32 +1,49 @@
 <!DOCTYPE html>
-
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
 
 <head>
     <title>Virtual Advent Calendar</title>
     <link rel="stylesheet" type="text/css" href="christmas.css">
 </head>
+<script language="javascript">
+    function changeImage(id,src) {
+        const doc = document.querySelector(("#"+id))
+        console.log("id:",id);
+        console.log("src:" ,src);
+        console.log("alt_src:",doc.dataset.alt_src);
 
-<meta>
+        if (document.getElementById(id).src == "icons/png/000.png") 
+        {
+            document.getElementById(id).src =
+            document.doc.dataset.alt_src ;
+        }
+        else 
+        {
+            document.getElementById("imgClickAndChange").src = document.getElementById("imgClickAndChange").src;
+        }
+    }
+</script>
+
 <header></header>
 
 <body>
     <div>        
         <h1>Advent Calendar</h1>
-        <h3>Graphic design is my passion</h3>
-
+        <h3>Graphic design is my passion! /s</h3>
+        
+        <h4>click on the numbers to open the advent calendar boxes</h4>
     </div>
     <div class = "calendar">
-
-        <!-- <img src = "christmas.jpg"
-        alt = "Christmas Nativity Scene Background"
-        class = "background_image"
-        > -->
-        <p>. </p>
         <figure class="item" >
-            <img src="icons/png/003-christmas-card.png" class="gallery__img" alt="Day 1: a christmas card with a tree on it">
+            <img id = "d1" 
+            src="icons/png/000.png"
+            data-alt_src="icons/png/003-christmas-card.png" 
+            alt="Day 1: a christmas card with a tree on it" onclick="changeImage(id,src)">
         </figure>
         <figure class="item" >
-            <img src="icons/png/009-bauble-1.png" class="gallery__img" alt="Day 2: a christmas tree ornament">
+            <img id = 2 src="icons/png/009-bauble-1.png" class="gallery__img" alt="Day 2: a christmas tree ornament"
+            onclick="changeImage(id)">
         </figure>
     </div>
     <div>
