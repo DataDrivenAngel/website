@@ -27,13 +27,15 @@ img {
 
 div.calendar {
   background-image: url("christmas.jpg");
-  height: 100%;
+  background-position: 0px -200px;
+  height: 1080px;
   width: 100%;
   border-radius: 15px;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, 2fr);
   grid-template-rows: repeat(5, 5vw);
-  grid-gap: 20px;
+  row-gap: 20px;
+  column-gap: 20px;
 }
 
 .item {
