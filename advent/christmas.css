@@ -45,19 +45,11 @@ div.calendar {
   box-shadow: 2px 2px 2px black;
   opacity: .1;
 }
- .text {
-  position: relative;
-  top: -106px;
-  left: 24px;
-  opacity: 0;
-  font-size: 80px;
-}
+
 .item:hover {
   opacity: .2;
 }
- .text:hover {
-  opacity: .8
-}
+
 
 .item_clicked {
   width: 106px;
@@ -67,7 +59,7 @@ div.calendar {
   border-radius: 10px;
   
   box-shadow: 2px 2px 2px black;
-  opacity: 0.88;
+  opacity: 1;
 }
 
 .center_text {

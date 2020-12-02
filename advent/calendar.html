@@ -10,15 +10,13 @@
 <script language="javascript">
     function changeImage(id,src) {
         const doc = document.querySelector(("#"+id))
-        // console.log("id:",id);
-        // console.log("src:" ,src.slice(-7));
-        // console.log("alt_src:",doc.dataset.alt_src);
 
-        if (document.getElementById(id).src.slice(-7) == "000.png") 
+        if (doc.dataset.toggle == 'false') 
         {
             document.getElementById(id).src =
             doc.dataset.alt_src ;
-            doc.className = "item_clicked"
+            doc.dataset.togglle = 'true';
+            doc.className = "item_clicked";
         }
 
     }
@@ -34,18 +32,17 @@
         <h4>click on the numbers to open the advent calendar boxes</h4>
     </div>
     <div class = "calendar">
-        <figure onclick="changeImage(id,src)">
-            <div >
+        <figure>
                 <img class="item"
                     id = "d1" 
-                    src="icons/png/000.png"
+                    src="icons/png/001.png"
+                    data-toggle="false"
                     data-alt_src="icons/png/003-christmas-card.png" 
                     alt="Day 1: a christmas card with a tree on it"
                     
                     onclick="changeImage(id,src)">
-                <div class="text">1</div>
-            </div>
-            
+
+
             
         </figure>
 
