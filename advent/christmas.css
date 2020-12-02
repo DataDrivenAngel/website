@@ -76,14 +76,18 @@ h3 {
   text-shadow: 2px 2px violet;
     }
 
-    .button {
-      background-color: #133e7c;
-      color: #0abdc6;
-      border: black;
-      border-radius: 4px;
-      font-size: 2em;
-  }
-  .button:hover {
-      background-color: #711c91;
-      color: #0abdc6;
-  }
+.button {
+  background-color: #133e7c;
+  color: #0abdc6;
+  border: black;
+  border-radius: 4px;
+  font-size: 2em;
+}
+.button:hover {
+  background-color: #711c91;
+  color: #0abdc6;
+}
+
+.hidden {
+  display: none;
+}

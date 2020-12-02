@@ -19,8 +19,16 @@
             doc.className = "item_clicked";
         }
 
-    }
+    };
+    function toggleImage() {
+        const image = document.getElementById('image');
+        image.classList.toggle('hidden');
+        }
+
+
+
 </script>
+
 
 <header></header>
 
@@ -296,11 +304,11 @@
         <h2>
         Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></h2>
 
-        <input  class = "button"
-                type = "button"
-                value ="Are you sure that graphic design is your passion?"
-        >
-        <img src="graphic_design.png">
+        <button id = 'button' class = "button" onclick = "toggleImage()">
+            "Are you sure that graphic design is your passion?"
+        </button>
+        <img id = "image" src="icons/png/graphic_design.png" class = "hidden">
+        
         <h1>Back to my <a href = "https://williamangel.net?utm_source=adventcalendar">Home Page</a></h1>
     </div>
 
