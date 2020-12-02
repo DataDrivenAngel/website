@@ -33,7 +33,7 @@ div.calendar {
   border-radius: 15px;
   display: grid;
   grid-template-columns: repeat(5, 2fr);
-  grid-template-rows: repeat(5, 5vw);
+  /* grid-template-rows: repeat(5, 5vw); */
   row-gap: 20px;
   column-gap: 20px;
 }
@@ -45,11 +45,11 @@ div.calendar {
   background-color: white;
   border-radius: 10px;
   box-shadow: 2px 2px 2px black;
-  opacity: .1;
+  opacity: .2;
 }
 
 .item:hover {
-  opacity: .2;
+  opacity: .4;
 }
 
 
