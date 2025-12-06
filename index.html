@@ -1,45 +1,202 @@
 <!DOCTYPE html>
-<html lang ="en">
+<html lang="en">
+
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">  
-    
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-SPPPPB9KSW"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  gtag('config', 'G-SPPPPB9KSW');
-</script>
-<meta name="Description" content="Welcome to Will Angel's personal web page. I'm a data / product person and this is my little corner of the web.">
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-SPPPPB9KSW"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
 
-<title>Will Angel</title>
-		
- <link rel="stylesheet" type="text/css" href="/css/main.css">
+		gtag('config', 'G-SPPPPB9KSW');
+	</script>
+	<meta name="Description"
+		content="Welcome to Will Angel's personal web page. I'm a data / product person and this is my little corner of the web.">
+
+	<title>Will Angel</title>
+
+	<link rel="stylesheet" type="text/css" href="/css/main.css">
+	<style>
+		/* Cookie Popup Styles */
+		.cookie-popup-overlay {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.7);
+			z-index: 9999;
+			animation: fadeIn 0.3s ease-in;
+		}
+
+		.cookie-popup {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			padding: 40px;
+			border-radius: 20px;
+			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+			text-align: center;
+			max-width: 400px;
+			animation: slideIn 0.4s ease-out;
+		}
+
+		.cookie-icon {
+			font-size: 80px;
+			margin-bottom: 20px;
+			animation: bounce 1s infinite;
+		}
+
+		.cookie-popup h2 {
+			color: white;
+			font-family: 'Helvetica', 'Arial', 'Sans-Serif';
+			font-size: 1.8em;
+			margin: 0 0 20px 0;
+		}
+
+		.cookie-popup-button {
+			display: inline-block;
+			background-color: #ffd700;
+			color: #333;
+			padding: 15px 30px;
+			border-radius: 50px;
+			text-decoration: none;
+			font-family: 'Helvetica', 'Arial', 'Sans-Serif';
+			font-weight: bold;
+			font-size: 1.2em;
+			transition: all 0.3s ease;
+			box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+		}
+
+		.cookie-popup-button:hover {
+			background-color: #ffed4e;
+			transform: translateY(-2px);
+			box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+		}
+
+		.cookie-popup-close {
+			position: absolute;
+			top: 15px;
+			right: 20px;
+			color: white;
+			font-size: 28px;
+			cursor: pointer;
+			background: none;
+			border: none;
+			opacity: 0.7;
+			transition: opacity 0.3s ease;
+		}
+
+		.cookie-popup-close:hover {
+			opacity: 1;
+		}
+
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+			}
+
+			to {
+				opacity: 1;
+			}
+		}
+
+		@keyframes slideIn {
+			from {
+				transform: translate(-50%, -60%);
+				opacity: 0;
+			}
+
+			to {
+				transform: translate(-50%, -50%);
+				opacity: 1;
+			}
+		}
+
+		@keyframes bounce {
+
+			0%,
+			100% {
+				transform: translateY(0);
+			}
+
+			50% {
+				transform: translateY(-10px);
+			}
+		}
+	</style>
 </head>
-	<body>
-		<nav>
-			<ul>
-				<li><a href="/">Home</a></li>
-				<li><a href="/about">About</a></li>
-				<li><a href="/book">Book</a></li>
-			</ul>
-		</nav>
-			<div class="container">
-			<div class="blurb">
-				<h1>Will Angel's Website!</h1>
-					<p>I do AI engineering to help people solve data intensive challenges and am the author of <a href="/book"><em>Virtual Power </em></a></p>
 
-			</div><!-- /.blurb -->
-			</div><!-- /.container -->
-		<footer>
-			<ul>
-				<li><a href="https://twitter.com/DataDrivenAngel">Twitter</a></li>
-				<li><a href="https://www.linkedin.com/in/william-angel/">LinkedIn</a></li>
-				<li><a href="https://github.com/DataDrivenAngel">GitHub</a></li>
-				<li><a href="https://www.williamangel.net/fun_zone.html">Enter the Fun Zone</a></li>
-			</ul>
-		</footer>
-	</body>
+<body>
+	<!-- Cookie Popup -->
+	<div class="cookie-popup-overlay" id="cookiePopupOverlay">
+		<div class="cookie-popup">
+			<button class="cookie-popup-close" onclick="closeCookiePopup()">&times;</button>
+			<div class="cookie-icon">🍪</div>
+			<h2>Play my cookie clicker game!</h2>
+			<a href="/clicker/game/index.html" class="cookie-popup-button">Let's Play!</a>
+			<p>Also this website uses google analytics</P>
+		</div>
+	</div>
+	<nav>
+		<ul>
+			<li><a href="/">Home</a></li>
+			<li><a href="/about">About</a></li>
+			<li><a href="/book">Book</a></li>
+		</ul>
+	</nav>
+	<div class="container">
+		<div class="blurb">
+			<h1>Will Angel's Website!</h1>
+			<p>I do AI engineering to help people solve data intensive challenges and am the author of <a
+					href="/book"><em>Virtual Power </em></a></p>
+
+		</div><!-- /.blurb -->
+	</div><!-- /.container -->
+	<footer>
+		<ul>
+			<li><a href="https://twitter.com/DataDrivenAngel">Twitter</a></li>
+			<li><a href="https://www.linkedin.com/in/william-angel/">LinkedIn</a></li>
+			<li><a href="https://github.com/DataDrivenAngel">GitHub</a></li>
+			<li><a href="https://www.williamangel.net/fun_zone.html">Enter the Fun Zone</a></li>
+		</ul>
+	</footer>
+
+	<script>
+		// Check if this is the user's first visit
+		function checkFirstVisit() {
+			const hasVisited = localStorage.getItem('hasVisitedBefore');
+
+			if (!hasVisited) {
+				// Show the popup after a short delay for better UX
+				setTimeout(() => {
+					document.getElementById('cookiePopupOverlay').style.display = 'block';
+				}, 500);
+			}
+		}
+
+		// Close the popup and mark as visited
+		function closeCookiePopup() {
+			document.getElementById('cookiePopupOverlay').style.display = 'none';
+			localStorage.setItem('hasVisitedBefore', 'true');
+		}
+
+		// Close popup when clicking outside of it
+		document.getElementById('cookiePopupOverlay').addEventListener('click', function (e) {
+			if (e.target === this) {
+				closeCookiePopup();
+			}
+		});
+
+		// Run the check when page loads
+		window.addEventListener('load', checkFirstVisit);
+	</script>
+</body>
+
 </html>
