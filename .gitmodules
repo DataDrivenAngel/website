@@ -1,0 +1,3 @@
+[submodule "clicker"]
+	path = clicker
+	url = https://github.com/DataDrivenAngel/clicker.git
