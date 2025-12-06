@@ -24,97 +24,89 @@
 		.cookie-popup-overlay {
 			display: none;
 			position: fixed;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background-color: rgba(0, 0, 0, 0.7);
+			bottom: 20px;
+			right: 20px;
 			z-index: 9999;
-			animation: fadeIn 0.3s ease-in;
+			animation: slideInFromBottom 0.4s ease-out;
 		}
 
 		.cookie-popup {
-			position: fixed;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
 			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-			padding: 40px;
-			border-radius: 20px;
-			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+			padding: 15px 20px;
+			border-radius: 12px;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 			text-align: center;
-			max-width: 400px;
-			animation: slideIn 0.4s ease-out;
+			max-width: 280px;
+			position: relative;
 		}
 
 		.cookie-icon {
-			font-size: 80px;
-			margin-bottom: 20px;
+			font-size: 32px;
+			margin-bottom: 8px;
 			animation: bounce 1s infinite;
 		}
 
 		.cookie-popup h2 {
 			color: white;
 			font-family: 'Helvetica', 'Arial', 'Sans-Serif';
-			font-size: 1.8em;
-			margin: 0 0 20px 0;
+			font-size: 0.95em;
+			margin: 0 0 10px 0;
 		}
 
 		.cookie-popup-button {
 			display: inline-block;
 			background-color: #ffd700;
 			color: #333;
-			padding: 15px 30px;
+			padding: 8px 20px;
 			border-radius: 50px;
 			text-decoration: none;
 			font-family: 'Helvetica', 'Arial', 'Sans-Serif';
 			font-weight: bold;
-			font-size: 1.2em;
+			font-size: 0.9em;
 			transition: all 0.3s ease;
-			box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+			box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
 		}
 
 		.cookie-popup-button:hover {
 			background-color: #ffed4e;
 			transform: translateY(-2px);
-			box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+			box-shadow: 0 4px 12px rgba(255, 215, 0, 0.6);
 		}
 
 		.cookie-popup-close {
 			position: absolute;
-			top: 15px;
-			right: 20px;
+			top: 8px;
+			right: 10px;
 			color: white;
-			font-size: 28px;
+			font-size: 20px;
 			cursor: pointer;
 			background: none;
 			border: none;
 			opacity: 0.7;
 			transition: opacity 0.3s ease;
+			line-height: 1;
 		}
 
 		.cookie-popup-close:hover {
 			opacity: 1;
 		}
 
-		@keyframes fadeIn {
-			from {
-				opacity: 0;
-			}
-
-			to {
-				opacity: 1;
-			}
+		.cookie-popup p {
+			color: white;
+			font-family: 'Helvetica', 'Arial', 'Sans-Serif';
+			font-size: 0.75em;
+			margin: 8px 0 0 0;
+			opacity: 0.9;
 		}
 
-		@keyframes slideIn {
+		@keyframes slideInFromBottom {
 			from {
-				transform: translate(-50%, -60%);
+				transform: translateY(100px);
 				opacity: 0;
 			}
 
 			to {
-				transform: translate(-50%, -50%);
+				transform: translateY(0);
 				opacity: 1;
 			}
 		}
@@ -127,7 +119,7 @@
 			}
 
 			50% {
-				transform: translateY(-10px);
+				transform: translateY(-5px);
 			}
 		}
 	</style>
@@ -186,13 +178,6 @@
 			document.getElementById('cookiePopupOverlay').style.display = 'none';
 			localStorage.setItem('hasVisitedBefore', 'true');
 		}
-
-		// Close popup when clicking outside of it
-		document.getElementById('cookiePopupOverlay').addEventListener('click', function (e) {
-			if (e.target === this) {
-				closeCookiePopup();
-			}
-		});
 
 		// Run the check when page loads
 		window.addEventListener('load', checkFirstVisit);
