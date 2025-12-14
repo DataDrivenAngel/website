@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festive Fireplace</title>
+    <style>
+        body {
+            background-color: #0f0f12;
+            /* Deep dark background */
+            color: #fff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Vignette effect for cozy atmosphere */
+        body::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, transparent 40%, #000 100%);
+            pointer-events: none;
+        }
+
+        .fireplace-scene {
+            position: relative;
+            width: 1240px;
+            height: 640px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 70px;
+        }
+
+        /* Minimalist Mantle/Hearth */
+        .hearth {
+            position: absolute;
+            bottom: 20px;
+            width: 1120px;
+            height: 18px;
+            background: linear-gradient(90deg, #2b150d, #4e342e 20%, #6d4c41 50%, #4e342e 80%, #2b150d);
+            border-radius: 9px;
+            border: 1px solid rgba(0, 0, 0, 0.45);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.85), inset 0 4px 12px rgba(255, 255, 255, 0.08);
+            z-index: 100;
+        }
+
+        /* Stone surround suggestion */
+        .stone-surround {
+            position: absolute;
+            bottom: 35px;
+            width: 1100px;
+            height: 360px;
+            border: 26px solid #654321;
+            border-bottom: none;
+            border-radius: 18px 18px 0 0;
+            z-index: 0;
+            opacity: 0.85;
+            background:
+                repeating-linear-gradient(90deg, #a0522d 0px, #a0522d 58px, #654321 58px, #654321 60px),
+                repeating-linear-gradient(0deg, #a0522d 0px, #a0522d 18px, #654321 18px, #654321 20px),
+                #a0522d;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(0, 0, 0, 0.8);
+        }
+
+        /* The Fire */
+        .fire-container {
+            position: relative;
+            width: 1180px;
+            height: 420px;
+            mix-blend-mode: screen;
+            z-index: 10;
+            isolation: isolate;
+            filter: drop-shadow(0 35px 65px rgba(0, 0, 0, 0.65));
+        }
+
+        /* Main Flame Blobs */
+        .flame {
+            position: absolute;
+            bottom: 0;
+            --center: 50%;
+            left: var(--center);
+            transform: translateX(-50%);
+            border-radius: 52% 48% 28% 32% / 75% 75% 35% 35%;
+            filter: saturate(1.3) blur(4px) contrast(1.15);
+            opacity: 0.92;
+            mix-blend-mode: screen;
+            animation: flicker infinite ease-in-out;
+            background:
+                radial-gradient(ellipse at 50% 88%, rgba(255, 245, 230, 0.98) 0%, rgba(255, 200, 100, 0.95) 8%, rgba(255, 140, 50, 0.92) 18%, rgba(255, 90, 25, 0.88) 35%, rgba(240, 75, 18, 0.80) 55%, rgba(195, 50, 15, 0.65) 75%, rgba(140, 25, 8, 0.4) 90%, transparent 100%),
+                radial-gradient(ellipse at 35% 35%, rgba(255, 220, 120, 0.55) 0%, rgba(255, 150, 50, 0.35) 25%, transparent 55%),
+                radial-gradient(ellipse at 65% 25%, rgba(255, 180, 70, 0.45) 0%, rgba(240, 100, 30, 0.3) 30%, transparent 60%);
+            background-size: 115% 120%, 80% 80%, 75% 75%;
+            background-position: center bottom, 35% 35%, 65% 25%;
+            box-shadow:
+                0 0 40px rgba(255, 180, 75, 0.55),
+                0 -25px 70px rgba(255, 120, 35, 0.45),
+                0 -50px 100px rgba(210, 80, 20, 0.25),
+                inset 0 -10px 30px rgba(255, 220, 150, 0.35);
+        }
+
+        .flame:not(.halo):not(.ember)::before,
+        .flame:not(.halo):not(.ember)::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 70%;
+            height: 70%;
+            border-radius: inherit;
+            background: inherit;
+            filter: blur(8px);
+            opacity: 0.6;
+            transform: translate(-50%, 0) scale(0.9);
+            animation: lick 1.4s infinite ease-in-out;
+        }
+
+        .flame:not(.halo):not(.ember)::after {
+            width: 40%;
+            height: 55%;
+            opacity: 0.4;
+            filter: blur(5px);
+            animation-duration: 1s;
+            animation-delay: 0.2s;
+        }
+
+        /* Core heat (orange/red) - Photorealistic hottest core */
+        .flame.core {
+            width: 270px;
+            height: 320px;
+            bottom: 25px;
+            animation-duration: 0.28s;
+            z-index: 12;
+            filter: saturate(1.4) blur(3px) contrast(1.2);
+            background:
+                radial-gradient(ellipse at 50% 92%, rgba(255, 248, 240, 1) 0%, rgba(255, 235, 205, 0.98) 5%, rgba(255, 200, 120, 0.96) 12%, rgba(255, 160, 60, 0.93) 28%, rgba(255, 110, 30, 0.90) 48%, rgba(240, 85, 20, 0.85) 70%, rgba(200, 60, 18, 0.75) 88%, rgba(150, 40, 12, 0.55) 98%);
+            box-shadow:
+                0 0 55px rgba(255, 200, 100, 0.75),
+                0 -30px 80px rgba(255, 140, 50, 0.55),
+                0 -60px 110px rgba(210, 80, 25, 0.35),
+                inset 0 -8px 25px rgba(255, 240, 220, 0.45);
+        }
+
+        /* Middle flames (orange) - More realistic transition */
+        .flame.mid {
+            width: 540px;
+            height: 360px;
+            bottom: 10px;
+            animation-duration: 0.45s;
+            animation-delay: 0.05s;
+            z-index: 9;
+            filter: blur(16px) saturate(1.25) contrast(1.1);
+            background:
+                radial-gradient(ellipse at 50% 78%, rgba(255, 180, 80, 0.88) 15%, rgba(255, 140, 50, 0.82) 35%, rgba(235, 100, 25, 0.75) 60%, rgba(180, 60, 15, 0.58) 80%, rgba(140, 40, 10, 0.4) 95%, transparent 100%),
+                radial-gradient(circle at 40% 40%, rgba(255, 160, 70, 0.35), transparent 55%);
+        }
+
+        /* Outer flames (red/transparent) - Deeper color gradation */
+        .flame.outer {
+            width: 780px;
+            height: 420px;
+            bottom: 0;
+            animation-duration: 0.75s;
+            animation-delay: 0.2s;
+            z-index: 6;
+            filter: blur(28px) saturate(1.15) contrast(1.05);
+            background:
+                radial-gradient(ellipse at 50% 72%, rgba(255, 165, 60, 0.82) 12%, rgba(255, 130, 40, 0.75) 28%, rgba(255, 94, 22, 0.68) 48%, rgba(200, 60, 15, 0.55) 68%, rgba(140, 35, 8, 0.38) 88%, rgba(80, 20, 5, 0.18) 100%);
+        }
+
+        /* Secondary flames for width */
+        .flame.side-left {
+            --center: 30%;
+            width: 320px;
+            height: 280px;
+            bottom: 20px;
+            animation-duration: 0.5s;
+            animation-delay: 0.3s;
+            z-index: 10;
+            filter: blur(14px);
+        }
+
+        .flame.side-right {
+            --center: 70%;
+            width: 320px;
+            height: 300px;
+            bottom: 20px;
+            animation-duration: 0.55s;
+            animation-delay: 0.07s;
+            z-index: 10;
+            filter: blur(14px);
+        }
+
+        .flame.ribbon-left {
+            --center: 42%;
+            width: 170px;
+            height: 260px;
+            bottom: 60px;
+            animation-duration: 0.35s;
+            animation-delay: 0.05s;
+            z-index: 13;
+            filter: blur(10px);
+            opacity: 0.95;
+        }
+
+        .flame.ribbon-right {
+            --center: 58%;
+            width: 170px;
+            height: 280px;
+            bottom: 70px;
+            animation-duration: 0.32s;
+            animation-delay: 0.12s;
+            z-index: 13;
+            filter: blur(10px);
+            opacity: 0.95;
+        }
+
+        .flame.halo {
+            width: 950px;
+            height: 320px;
+            bottom: -20px;
+            opacity: 0.55;
+            filter: blur(90px);
+            animation: glow-pulse 4s infinite ease-in-out;
+            background: radial-gradient(circle, rgba(255, 140, 40, 0.35) 0%, rgba(255, 80, 20, 0.2) 40%, transparent 80%);
+            z-index: 1;
+        }
+
+        .flame.ember {
+            width: 700px;
+            height: 220px;
+            bottom: -10px;
+            opacity: 0.8;
+            filter: blur(25px);
+            background: radial-gradient(ellipse at center, rgba(255, 130, 30, 0.8), rgba(255, 80, 20, 0.4) 70%, transparent 100%);
+            animation: glow-pulse 3s infinite ease-in-out;
+            z-index: 5;
+        }
+
+        /* Logs - Photorealistic wood */
+        .logs {
+            position: absolute;
+            bottom: 10px;
+            width: 820px;
+            height: 60px;
+            z-index: 20;
+        }
+
+        .log {
+            position: absolute;
+            background:
+                linear-gradient(180deg, rgba(60, 40, 30, 0.4) 0%, transparent 30%, transparent 70%, rgba(0, 0, 0, 0.6) 100%),
+                linear-gradient(90deg, #2d1810 0%, #3e2723 10%, #4e342e 25%, #5d4037 40%, #6d4c41 50%, #5d4037 60%, #4e342e 75%, #3e2723 90%, #2d1810 100%);
+            border-radius: 5px;
+            box-shadow:
+                inset 2px 3px 12px rgba(0, 0, 0, 0.85),
+                inset -2px -2px 8px rgba(80, 50, 35, 0.25),
+                0 4px 15px rgba(0, 0, 0, 0.8),
+                0 12px 30px rgba(255, 120, 40, 0.15);
+        }
+
+        .log.back {
+            width: 100%;
+            height: 50px;
+            bottom: 20px;
+            left: 0;
+            filter: brightness(0.55) saturate(0.8);
+            box-shadow:
+                inset 2px 3px 12px rgba(0, 0, 0, 0.9),
+                0 6px 20px rgba(0, 0, 0, 0.85);
+        }
+
+        .log.front-left {
+            width: 220px;
+            height: 40px;
+            bottom: 0;
+            left: 10px;
+            transform: rotate(10deg);
+            filter: brightness(0.95);
+        }
+
+        .log.front-center {
+            width: 200px;
+            height: 40px;
+            bottom: 0px;
+            left: 50%;
+            transform: translateX(-50%) rotate(0deg);
+            z-index: 21;
+            filter: brightness(1.05);
+        }
+
+        .log.front-right {
+            width: 220px;
+            height: 40px;
+            bottom: 0;
+            right: 10px;
+            transform: rotate(-10deg);
+            filter: brightness(0.92);
+        }
+
+        /* Log detail (realistic bark texture) */
+        .log::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                repeating-linear-gradient(90deg, transparent 0, transparent 8px, rgba(0, 0, 0, 0.35) 8px, rgba(0, 0, 0, 0.35) 10px, transparent 10px, transparent 18px, rgba(0, 0, 0, 0.25) 18px, rgba(0, 0, 0, 0.25) 19px),
+                repeating-linear-gradient(92deg, transparent 0, transparent 12px, rgba(0, 0, 0, 0.15) 12px, rgba(0, 0, 0, 0.15) 13px);
+            border-radius: 5px;
+            mix-blend-mode: multiply;
+        }
+        
+        /* Add charred effect to log ends */
+        .log::before {
+            content: '';
+            position: absolute;
+            right: -3px;
+            top: 10%;
+            width: 8px;
+            height: 80%;
+            background:
+                radial-gradient(ellipse at center, rgba(40, 20, 10, 0.95) 0%, rgba(20, 10, 5, 0.8) 50%, transparent 100%),
+                linear-gradient(180deg, rgba(255, 120, 40, 0.15) 0%, rgba(255, 80, 20, 0.25) 50%, rgba(255, 120, 40, 0.15) 100%);
+            border-radius: 50%;
+            filter: blur(1px);
+        }
+
+        /* Glowing Embers at base - Photorealistic hot coals */
+        .embers-bed {
+            position: absolute;
+            bottom: 10px;
+            width: 950px;
+            height: 70px;
+            background:
+                radial-gradient(ellipse at 35% center, rgba(255, 240, 220, 0.4) 0%, transparent 15%),
+                radial-gradient(ellipse at 55% center, rgba(255, 230, 200, 0.35) 0%, transparent 12%),
+                radial-gradient(ellipse at 65% center, rgba(255, 235, 210, 0.38) 0%, transparent 14%),
+                radial-gradient(ellipse at center, rgba(255, 200, 120, 0.98) 0%, rgba(255, 150, 60, 0.95) 25%, rgba(255, 120, 30, 0.88) 45%, rgba(255, 90, 15, 0.7) 65%, rgba(200, 60, 10, 0.45) 82%, rgba(120, 30, 5, 0.2) 100%);
+            filter: blur(20px) saturate(1.3);
+            opacity: 0.9;
+            animation: pulse-glow 3s infinite ease-in-out;
+            z-index: 15;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow:
+                0 0 40px rgba(255, 150, 50, 0.6),
+                0 0 80px rgba(255, 100, 20, 0.4);
+        }
+
+        /* Animations */
+        @keyframes flicker {
+            0% {
+                transform: translateX(-50%) scale(1) skewX(0deg);
+                opacity: 0.95;
+            }
+
+            20% {
+                transform: translateX(-49%) scale(1.08, 1.12) skewX(-2deg) translateY(-6px);
+                opacity: 0.8;
+            }
+
+            45% {
+                transform: translateX(-51%) scale(0.96, 0.9) skewX(1deg);
+                opacity: 0.92;
+            }
+
+            70% {
+                transform: translateX(-48%) scale(1.03, 1.05) skewX(-1deg) translateY(-4px);
+                opacity: 0.78;
+            }
+
+            100% {
+                transform: translateX(-50%) scale(1) skewX(0deg);
+                opacity: 0.95;
+            }
+        }
+
+        @keyframes lick {
+            0% {
+                transform: translate(-50%, 0) scale(0.7, 0.9);
+                opacity: 0.7;
+            }
+
+            50% {
+                transform: translate(-50%, -25px) scale(1, 1.2);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: translate(-50%, -45px) scale(0.4, 0.6);
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                opacity: 0.5;
+                transform: translateX(-50%) scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: translateX(-50%) scale(1.1);
+            }
+        }
+
+        @keyframes glow-pulse {
+            0% {
+                opacity: 0.55;
+                transform: translateX(-50%) scale(0.95);
+            }
+
+            50% {
+                opacity: 0.85;
+                transform: translateX(-50%) scale(1.05);
+            }
+
+            100% {
+                opacity: 0.55;
+                transform: translateX(-50%) scale(0.95);
+            }
+        }
+
+        /* Sparks */
+        .spark {
+            position: absolute;
+            bottom: 40px;
+            width: 3px;
+            height: 3px;
+            background-color: #ffb347;
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 5px #ff9800;
+            opacity: 0;
+        }
+
+        @keyframes rise-and-fade {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(var(--dx), -200px) scale(0);
+            }
+        }
+
+        /* Snowflakes */
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            pointer-events: none;
+            animation: fall linear infinite;
+            z-index: 300;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateX(0) rotate(0deg);
+            }
+            100% {
+                transform: translateY(100vh) translateX(50px) rotate(360deg);
+            }
+        }
+
+        /* Smoke */
+        .smoke {
+            position: absolute;
+            bottom: 50px;
+            width: 15px;
+            height: 15px;
+            background: rgba(150, 150, 150, 0.4);
+            border-radius: 50%;
+            filter: blur(3px);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 25;
+        }
+
+        @keyframes rise-smoke {
+            0% {
+                opacity: 0.4;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--dx), -250px) scale(2);
+            }
+        }
+
+        /* Additional flame for realism */
+        .flame.blue-tip {
+            width: 120px;
+            height: 140px;
+            background: radial-gradient(circle, rgba(255, 140, 60, 0.6), transparent 70%);
+            bottom: 120px;
+            animation-duration: 0.33s;
+            animation-delay: 0.1s;
+            z-index: 14;
+            filter: blur(12px);
+        }
+
+        /* Christmas Tree */
+        .christmas-tree {
+            position: absolute;
+            bottom: 50px;
+            right: 50px;
+            width: 100px;
+            height: 150px;
+            opacity: 0.8;
+            z-index: 5;
+        }
+
+
+        /* Festive decor */
+        .decor {
+            position: absolute;
+            top: 50px;
+            width: 1060px;
+            /* Match surround width */
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .garland {
+            position: absolute;
+            width: 100%;
+            height: 40px;
+            top: 150px;
+            /* Positioned on the "mantle" area */
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+        }
+
+        /* Greenery */
+        .garland-green {
+            position: absolute;
+            top: -15px;
+            left: -20px;
+            width: calc(100% + 40px);
+            height: 30px;
+            background:
+                radial-gradient(circle at 50% 10px, #1b5e20 15px, transparent 16px),
+                radial-gradient(circle at 20px 15px, #2e7d32 12px, transparent 13px);
+            background-size: 40px 30px;
+            background-repeat: repeat-x;
+            filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.6));
+            z-index: 210;
+        }
+
+        /* Fairy Lights */
+        .lights {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-evenly;
+            pointer-events: none;
+            z-index: 215;
+        }
+
+        .light {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: twinkle 1s infinite alternate;
+            margin-top: 5px;
+        }
+
+        .light:nth-child(odd) {
+            background: #ffeb3b;
+            box-shadow: 0 0 5px #ffeb3b;
+            animation-duration: 1.2s;
+        }
+
+        .light:nth-child(even) {
+            background: #ff1744;
+            box-shadow: 0 0 5px #ff1744;
+            animation-duration: 0.8s;
+        }
+
+        .light:nth-child(3n) {
+            background: #00e676;
+            box-shadow: 0 0 5px #00e676;
+            animation-duration: 1.5s;
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0.5;
+                transform: scale(0.8);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        .back-link {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: color 0.3s;
+            z-index: 500;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .back-link:hover {
+            color: rgba(255, 255, 255, 1);
+            background: rgba(0, 0, 0, 0.8);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .fireplace-scene {
+                transform: scale(0.5);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <a href="calendar.html" class="back-link">&larr; Return to Calendar</a>
+
+    <div class="fireplace-scene">
+
+        <!-- Stone Surround/Mantle Background -->
+        <div class="stone-surround">
+            <!-- Interactive decoration area -->
+            <div class="decor">
+                <div class="garland">
+                    <div class="garland-green"></div>
+
+                    <!-- Lights strung along -->
+                    <div class="lights">
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                    </div>
+                    
+                    <!-- Additional lights for more festive look -->
+                    <div class="lights">
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="fire-container" id="fire">
+            <!-- Flames -->
+            <div class="flame halo"></div>
+            <div class="flame ember"></div>
+            <div class="flame outer"></div>
+            <div class="flame mid"></div>
+            <div class="flame side-left"></div>
+            <div class="flame side-right"></div>
+            <div class="flame ribbon-left"></div>
+            <div class="flame ribbon-right"></div>
+            <div class="flame core"></div>
+            <div class="flame blue-tip"></div>
+
+            <!-- Embers Base -->
+            <div class="embers-bed"></div>
+        </div>
+
+        <div class="logs">
+            <div class="log back"></div>
+            <div class="log front-left"></div>
+            <div class="log front-center"></div>
+            <div class="log front-right"></div>
+        </div>
+
+        <div class="hearth"></div>
+
+        <!-- Christmas Tree -->
+        <img src="icons/png/090-christmas-tree.png" class="christmas-tree" alt="Christmas Tree">
+    </div>
+
+    <script>
+        // JS Particle System for Sparks
+        const fireContainer = document.getElementById('fire');
+
+        function createSpark() {
+            const spark = document.createElement('div');
+            spark.classList.add('spark');
+
+            // Random horizontal start position - wider spread for wider fire
+            const startX = 50 + (Math.random() * 90 - 45);
+
+            // Random horizontal drift (dx)
+            const dx = (Math.random() * 140 - 70) + 'px';
+
+            spark.style.left = startX + '%';
+            spark.style.setProperty('--dx', dx);
+
+            const duration = 1 + Math.random(); // 1s to 2s
+            spark.style.animation = `rise-and-fade ${duration}s linear forwards`;
+
+            fireContainer.appendChild(spark);
+
+            // Cleanup match animation duration
+            setTimeout(() => {
+                spark.remove();
+            }, duration * 1000);
+        }
+
+        // Generate sparks more frequently
+        setInterval(createSpark, 80);
+
+        // Generate snowflakes
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+
+            const startX = Math.random() * 100;
+            snowflake.style.left = startX + '%';
+
+            const duration = 5 + Math.random() * 5; // 5-10s
+            snowflake.style.animationDuration = duration + 's';
+
+            document.body.appendChild(snowflake);
+
+            setTimeout(() => {
+                snowflake.remove();
+            }, duration * 1000);
+        }
+        setInterval(createSnowflake, 150);
+
+        // Generate smoke
+        function createSmoke() {
+            const smoke = document.createElement('div');
+            smoke.classList.add('smoke');
+
+            const startX = 20 + Math.random() * 60; // 20-80%
+            const dx = (Math.random() * 100 - 50) + 'px';
+
+            smoke.style.left = startX + '%';
+            smoke.style.setProperty('--dx', dx);
+
+            const duration = 3 + Math.random() * 2; // 3-5s
+            smoke.style.animation = `rise-smoke ${duration}s linear forwards`;
+
+            fireContainer.appendChild(smoke);
+
+            setTimeout(() => {
+                smoke.remove();
+            }, duration * 1000);
+        }
+        setInterval(createSmoke, 200);
+
+        const body = document.body;
+        // Subtle ambient flicker
+        setInterval(() => {
+            const opacity = 0.9 + Math.random() * 0.05;
+            // We could apply this to a light overlay, but standard flicker animation helps already.
+        }, 150);
+    </script>
+</body>
+
+</html>
