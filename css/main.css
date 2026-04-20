@@ -47,3 +47,40 @@ ul.posts {
 ul.posts li {
     list-style: none;
 }
+
+.blog-posts {
+    list-style: none;
+    margin: 24px 0 0;
+    padding: 0;
+}
+
+.blog-post {
+    border-bottom: 1px solid #d5d5d5;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+}
+
+.blog-post:last-child {
+    border-bottom: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.post-title {
+    font-family: 'Helvetica', 'Arial', 'Sans-Serif';
+    font-size: 1.8em;
+    line-height: 1.2;
+    margin: 0;
+}
+
+.post-meta {
+    color: #666;
+    font-family: 'Helvetica', 'Arial', 'Sans-Serif';
+    font-size: 1em;
+    margin: 10px 0 8px;
+}
+
+.post-excerpt {
+    font-size: 1.1em;
+    margin: 0;
+}
