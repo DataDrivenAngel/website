@@ -2223,10 +2223,20 @@ body {
 font-family: 'Helvetica', 'Arial', 'Sans-Serif';
 color: #333;
 }
+
 body.quarto-light {
-margin: 60px auto;
-width: 60%;
+    margin: 60px auto;
+    width: 60%;
+    max-width: 900px;
 }
+
+@media (max-width: 768px) {
+    body.quarto-light {
+        margin: 20px auto;
+        width: 90%;
+    }
+}
+
 
 body.quarto-light > #quarto-content {
 margin-left: auto;
