@@ -38,6 +38,13 @@ p {
     line-height: 1.4em;
     color: #333;
 }
+
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
 footer {
     border-top: 4px solid #d5d5d5;
     font-size: 1em;
