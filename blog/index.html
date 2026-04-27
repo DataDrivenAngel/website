@@ -123,8 +123,24 @@ gtag('config', 'G-SPPPPB9KSW');
 <div class="container">
 <div class="blog-list">
 <h1>Will Angel's Blog!</h1>
+<p class="blog-empty-filter" id="blog-empty-filter">No posts with this tag.</p>
+<nav class="blog-tag-filter" aria-label="Filter by tag">
+<ul class="blog-tag-filter-list">
+<li><a class="tag-pill" href="/blog/" data-tag="">All</a></li>
+<li><a class="tag-pill" href="/blog/?tag=agents" data-tag="agents">agents</a></li>
+<li><a class="tag-pill" href="/blog/?tag=ai" data-tag="ai">AI</a></li>
+<li><a class="tag-pill" href="/blog/?tag=climate" data-tag="climate">climate</a></li>
+<li><a class="tag-pill" href="/blog/?tag=coding" data-tag="coding">coding</a></li>
+<li><a class="tag-pill" href="/blog/?tag=data" data-tag="data">data</a></li>
+<li><a class="tag-pill" href="/blog/?tag=llms" data-tag="llms">LLMs</a></li>
+<li><a class="tag-pill" href="/blog/?tag=local-models" data-tag="local-models">local models</a></li>
+<li><a class="tag-pill" href="/blog/?tag=ollama" data-tag="ollama">Ollama</a></li>
+<li><a class="tag-pill" href="/blog/?tag=washington-dc" data-tag="washington-dc">Washington DC</a></li>
+<li><a class="tag-pill" href="/blog/?tag=weather" data-tag="weather">weather</a></li>
+</ul>
+</nav>
 <ul class="blog-posts">
-<li class="blog-post">
+<li class="blog-post" data-tags="ai llms agents local-models ollama coding">
 <article>
 <h2 class="post-title">
 <a href="/blog/2026/04/27/offline-agentic-coding.html">Offline Agentic Coding</a>
@@ -132,10 +148,11 @@ gtag('config', 'G-SPPPPB9KSW');
 <p class="post-meta">
 <time datetime="2026-04-27">April 27, 2026</time>
 </p>
-<p class="post-excerpt">Offline Agentic Coding</p>
+<p class="post-tags post-tags--index"><span>Tags: </span><a class="tag-pill" href="/blog/?tag=ai">AI</a>, <a class="tag-pill" href="/blog/?tag=llms">LLMs</a>, <a class="tag-pill" href="/blog/?tag=agents">agents</a>, <a class="tag-pill" href="/blog/?tag=local-models">local models</a>, <a class="tag-pill" href="/blog/?tag=ollama">Ollama</a>, <a class="tag-pill" href="/blog/?tag=coding">coding</a></p>
+<p class="post-excerpt">Offline Agentic Coding: Ollama and Claude code</p>
 </article>
 </li>
-<li class="blog-post">
+<li class="blog-post" data-tags="weather data washington-dc climate">
 <article>
 <h2 class="post-title">
 <a href="/blog/2026/04/19/Washington_DC_On_Track_For_Stormy_2026.html">Washington DC on track for most volatile temperature year since 1959</a>
@@ -143,10 +160,41 @@ gtag('config', 'G-SPPPPB9KSW');
 <p class="post-meta">
 <time datetime="2026-04-19">April 19, 2026</time>
 </p>
+<p class="post-tags post-tags--index"><span>Tags: </span><a class="tag-pill" href="/blog/?tag=weather">weather</a>, <a class="tag-pill" href="/blog/?tag=data">data</a>, <a class="tag-pill" href="/blog/?tag=washington-dc">Washington DC</a>, <a class="tag-pill" href="/blog/?tag=climate">climate</a></p>
 <p class="post-excerpt">An analysis of 85 years of daily weather data from Reagan National Airport.</p>
 </article>
 </li>
 </ul>
+
+<script>
+(function() {
+  var list = document.querySelector(".blog-posts");
+  if (!list) return;
+  var items = list.querySelectorAll("li.blog-post");
+  var emptyMsg = document.querySelector(".blog-empty-filter");
+  function apply() {
+    var params = new URLSearchParams(window.location.search);
+    var tag = (params.get("tag") || "").toLowerCase();
+    var anyVisible = false;
+    for (var i = 0; i < items.length; i++) {
+      var li = items[i];
+      var raw = (li.getAttribute("data-tags") || "").toLowerCase();
+      var set = raw.split(/\s+/).filter(Boolean);
+      var show = !tag || set.indexOf(tag) !== -1;
+      if (show) { li.removeAttribute("hidden"); anyVisible = true; }
+      else { li.setAttribute("hidden", ""); }
+    }
+    if (emptyMsg) emptyMsg.style.display = anyVisible ? "none" : "block";
+    var links = document.querySelectorAll(".blog-tag-filter .tag-pill");
+    for (var j = 0; j < links.length; j++) {
+      var a = links[j];
+      var t = (a.getAttribute("data-tag") || "").toLowerCase();
+      a.classList.toggle("is-active", t === tag);
+    }
+  }
+  apply();
+})();
+</script>
 </div>
 </div>
 </main>
