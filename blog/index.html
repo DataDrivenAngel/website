@@ -1,204 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-
-	<!-- Google tag (gtag.js) -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-SPPPPB9KSW"></script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
-
-		gtag('config', 'G-SPPPPB9KSW');
-	</script>
-	<meta name="Description"
-		content="Will Angel's Blog">
-
-	<title>Will Angel's Blog</title>
-
-	<link rel="stylesheet" type="text/css" href="../css/main.css">
-	<style>
-		/* Cookie Popup Styles */
-		.cookie-popup-overlay {
-			display: none;
-			position: fixed;
-			bottom: 20px;
-			right: 20px;
-			z-index: 9999;
-			animation: slideInFromBottom 0.4s ease-out;
-		}
-
-		.cookie-popup {
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-			padding: 15px 20px;
-			border-radius: 12px;
-			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-			text-align: center;
-			max-width: 280px;
-			position: relative;
-		}
-
-		.cookie-icon {
-			font-size: 32px;
-			margin-bottom: 8px;
-			animation: bounce 1s infinite;
-		}
-
-		.cookie-popup h2 {
-			color: white;
-			font-family: 'Helvetica', 'Arial', 'Sans-Serif';
-			font-size: 0.95em;
-			margin: 0 0 10px 0;
-		}
-
-		.cookie-popup-button {
-			display: inline-block;
-			background-color: #ffd700;
-			color: #333;
-			padding: 8px 20px;
-			border-radius: 50px;
-			text-decoration: none;
-			font-family: 'Helvetica', 'Arial', 'Sans-Serif';
-			font-weight: bold;
-			font-size: 0.9em;
-			transition: all 0.3s ease;
-			box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
-		}
-
-		.cookie-popup-button:hover {
-			background-color: #ffed4e;
-			transform: translateY(-2px);
-			box-shadow: 0 4px 12px rgba(255, 215, 0, 0.6);
-		}
-
-		.cookie-popup-close {
-			position: absolute;
-			top: 8px;
-			right: 10px;
-			color: white;
-			font-size: 20px;
-			cursor: pointer;
-			background: none;
-			border: none;
-			opacity: 0.7;
-			transition: opacity 0.3s ease;
-			line-height: 1;
-		}
-
-		.cookie-popup-close:hover {
-			opacity: 1;
-		}
-
-		.cookie-popup p {
-			color: white;
-			font-family: 'Helvetica', 'Arial', 'Sans-Serif';
-			font-size: 0.75em;
-			margin: 8px 0 0 0;
-			opacity: 0.9;
-		}
-
-		@keyframes slideInFromBottom {
-			from {
-				transform: translateY(100px);
-				opacity: 0;
-			}
-
-			to {
-				transform: translateY(0);
-				opacity: 1;
-			}
-		}
-
-		@keyframes bounce {
-
-			0%,
-			100% {
-				transform: translateY(0);
-			}
-
-			50% {
-				transform: translateY(-5px);
-			}
-		}
-	</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SPPPPB9KSW"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){ dataLayer.push(arguments); }
+gtag('js', new Date());
+gtag('config', 'G-SPPPPB9KSW');
+</script>
+<meta name="Description" content="Will Angel&#x27;s Blog">
+<meta property="og:title" content="Will Angel&#x27;s Blog">
+<meta property="og:description" content="Will Angel&#x27;s Blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="https://www.williamangel.net">
+<meta name="twitter:creator" content="@DataDrivenAngel">
+<meta name="twitter:title" content="Will Angel&#x27;s Blog">
+<meta name="twitter:description" content="Will Angel&#x27;s Blog">
+<title>Will Angel&#x27;s Blog</title>
+<link rel="stylesheet" type="text/css" href="/css/main.css">
 </head>
-
 <body>
-	<!-- Cookie Popup -->
-	<div class="cookie-popup-overlay" id="cookiePopupOverlay">
-		<div class="cookie-popup">
-			<button class="cookie-popup-close" onclick="closeCookiePopup()">&times;</button>
-			<div class="cookie-icon">🍪</div>
-			<h2>Play my cookie clicker game!</h2>
-			<a href="/clicker/game/index.html" class="cookie-popup-button">Let's Play!</a>
-			<p>Also this website uses google analytics</P>
-		</div>
-	</div>
-	<nav>
-		<ul>
-			<li><a href="/">Home</a></li>
-			<li><a href="/about">About</a></li>
-			<li><a href="/book">Book</a></li>
-			<li><a href="/blog">Blog</a></li>
-		</ul>
-	</nav>
-	<main>
-	<div class="container">
-		<div class="blog-list">
-			<h1>Will Angel's Blog!</h1>
-			<ul class="blog-posts">
-				<li class="blog-post">
-					<article>
-						<h2 class="post-title">
-							<a href="../blog/2026/04/19/Washington_DC_On_Track_For_Stormy_2026.html">Washington, DC on track for most volatile temperature year since 1959</a>
-						</h2>
-						<p class="post-meta">
-							<time datetime="2026-04-19">April 19, 2026:</time>
-							An analysis of 85 years of daily weather data from Reagan National Airport.
-						</p>
-						<p class="post-excerpt">
-							An analysis of 85 years of daily weather data from Reagan National Airport.
-						</p>
-					</article>
-				</li>
-			</ul>
-		</div><!-- /.blog-list -->
-	</div><!-- /.container -->
-	</main>
-	
-	<footer>
-		<ul>
-			<li><a href="https://twitter.com/DataDrivenAngel">Twitter</a></li>
-			<li><a href="https://www.linkedin.com/in/william-angel/">LinkedIn</a></li>
-			<li><a href="https://github.com/DataDrivenAngel">GitHub</a></li>
-			<!-- <li><a href="https://www.williamangel.net/fun_zone.html">Enter the Fun Zone</a></li> -->
-		</ul>
-	</footer>
+<style>
+.cookie-popup-overlay {
+	display: none;
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	z-index: 9999;
+	animation: slideInFromBottom 0.4s ease-out;
+}
+.cookie-popup {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	padding: 15px 20px;
+	border-radius: 12px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+	text-align: center;
+	max-width: 280px;
+	position: relative;
+}
+.cookie-icon {
+	font-size: 32px;
+	margin-bottom: 8px;
+	animation: bounce 1s infinite;
+}
+.cookie-popup h2 {
+	color: white;
+	font-family: 'Helvetica', 'Arial', 'Sans-Serif';
+	font-size: 0.95em;
+	margin: 0 0 10px 0;
+}
+.cookie-popup-button {
+	display: inline-block;
+	background-color: #ffd700;
+	color: #333;
+	padding: 8px 20px;
+	border-radius: 50px;
+	text-decoration: none;
+	font-family: 'Helvetica', 'Arial', 'Sans-Serif';
+	font-weight: bold;
+	font-size: 0.9em;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+.cookie-popup-button:hover {
+	background-color: #ffed4e;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(255, 215, 0, 0.6);
+}
+.cookie-popup-close {
+	position: absolute;
+	top: 8px;
+	right: 10px;
+	color: white;
+	font-size: 20px;
+	cursor: pointer;
+	background: none;
+	border: none;
+	opacity: 0.7;
+	transition: opacity 0.3s ease;
+	line-height: 1;
+}
+.cookie-popup-close:hover {
+	opacity: 1;
+}
+.cookie-popup p {
+	color: white;
+	font-family: 'Helvetica', 'Arial', 'Sans-Serif';
+	font-size: 0.75em;
+	margin: 8px 0 0 0;
+	opacity: 0.9;
+}
+@keyframes slideInFromBottom {
+	from { transform: translateY(100px); opacity: 0; }
+	to { transform: translateY(0); opacity: 1; }
+}
+@keyframes bounce {
+	0%, 100% { transform: translateY(0); }
+	50% { transform: translateY(-5px); }
+}
+</style>
+<div class="cookie-popup-overlay" id="cookiePopupOverlay">
+<div class="cookie-popup">
+<button class="cookie-popup-close" onclick="closeCookiePopup()">&times;</button>
+<div class="cookie-icon">🍪</div>
+<h2>Play my cookie clicker game!</h2>
+<a href="/clicker/game/index.html" class="cookie-popup-button">Let's Play!</a>
+<p>Also this website uses google analytics</p>
+</div>
+</div>
+<nav>
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/about">About</a></li>
+<li><a href="/book">Book</a></li>
+<li><a href="/blog">Blog</a></li>
+</ul>
+</nav>
+<main>
+<div class="container">
+<div class="blog-list">
+<h1>Will Angel's Blog!</h1>
+<ul class="blog-posts">
+<li class="blog-post">
+<article>
+<h2 class="post-title">
+<a href="/blog/2026/04/27/offline-agentic-coding.html">Offline Agentic Coding</a>
+</h2>
+<p class="post-meta">
+<time datetime="2026-04-27">April 27, 2026</time>
+</p>
+<p class="post-excerpt">Offline Agentic Coding</p>
+</article>
+</li>
+<li class="blog-post">
+<article>
+<h2 class="post-title">
+<a href="/blog/2026/04/19/Washington_DC_On_Track_For_Stormy_2026.html">Washington DC on track for most volatile temperature year since 1959</a>
+</h2>
+<p class="post-meta">
+<time datetime="2026-04-19">April 19, 2026</time>
+</p>
+<p class="post-excerpt">An analysis of 85 years of daily weather data from Reagan National Airport.</p>
+</article>
+</li>
+</ul>
+</div>
+</div>
+</main>
 
-	<script>
-		// Check if this is the user's first visit
-		function checkFirstVisit() {
-			const hasVisited = localStorage.getItem('hasVisitedBefore');
-
-			if (!hasVisited) {
-				// Show the popup after a short delay for better UX
-				setTimeout(() => {
-					document.getElementById('cookiePopupOverlay').style.display = 'block';
-				}, 500);
-			}
-		}
-
-		// Close the popup and mark as visited
-		function closeCookiePopup() {
-			document.getElementById('cookiePopupOverlay').style.display = 'none';
-			localStorage.setItem('hasVisitedBefore', 'true');
-		}
-
-		// Run the check when page loads
-		window.addEventListener('load', checkFirstVisit);
-	</script>
+<footer>
+<ul>
+<li><a href="https://twitter.com/DataDrivenAngel">Twitter</a></li>
+<li><a href="https://www.linkedin.com/in/william-angel/">LinkedIn</a></li>
+<li><a href="https://github.com/DataDrivenAngel">GitHub</a></li>
+</ul>
+</footer>
+<script>
+function checkFirstVisit() {
+    const hasVisited = localStorage.getItem('hasVisitedBefore');
+    if (!hasVisited) {
+        setTimeout(() => {
+            document.getElementById('cookiePopupOverlay').style.display = 'block';
+        }, 500);
+    }
+}
+function closeCookiePopup() {
+    document.getElementById('cookiePopupOverlay').style.display = 'none';
+    localStorage.setItem('hasVisitedBefore', 'true');
+}
+window.addEventListener('load', checkFirstVisit);
+</script>
 </body>
-
 </html>
