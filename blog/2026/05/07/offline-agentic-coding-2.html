@@ -11,18 +11,18 @@ function gtag(){ dataLayer.push(arguments); }
 gtag('js', new Date());
 gtag('config', 'G-SPPPPB9KSW');
 </script>
-<meta name="Description" content="Offline Agentic Coding: Ollama and Claude code">
-<meta property="og:title" content="Offline Agentic Coding">
-<meta property="og:description" content="Offline Agentic Coding: Ollama and Claude code">
-<meta property="og:image" content="https://www.williamangel.net/blog/2026/04/27/2026-04-27-offline_agentic_coding.png">
-<meta property="og:url" content="https://www.williamangel.net/blog/2026/04/27/offline-agentic-coding.html">
+<meta name="Description" content="Limitations of offline coding">
+<meta property="og:title" content="Offline Agentic Coding: OpenCode">
+<meta property="og:description" content="Limitations of offline coding">
+<meta property="og:image" content="https://www.williamangel.net/blog/2026/05/07/2026-05-07-offline_agentic_coding_2.png">
+<meta property="og:url" content="https://www.williamangel.net/blog/2026/05/07/offline-agentic-coding-2.html">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="https://www.williamangel.net">
 <meta name="twitter:creator" content="@DataDrivenAngel">
-<meta name="twitter:title" content="Offline Agentic Coding">
-<meta name="twitter:description" content="Offline Agentic Coding: Ollama and Claude code">
-<meta name="twitter:image" content="https://www.williamangel.net/blog/2026/04/27/2026-04-27-offline_agentic_coding.png">
-<title>Offline Agentic Coding</title>
+<meta name="twitter:title" content="Offline Agentic Coding: OpenCode">
+<meta name="twitter:description" content="Limitations of offline coding">
+<meta name="twitter:image" content="https://www.williamangel.net/blog/2026/05/07/2026-05-07-offline_agentic_coding_2.png">
+<title>Offline Agentic Coding: OpenCode</title>
 <link rel="stylesheet" type="text/css" href="/css/main.css">
 </head>
 <body>
@@ -124,24 +124,25 @@ gtag('config', 'G-SPPPPB9KSW');
 </nav>
 <main>
 <div class="container">
-<p class="post-tags" aria-label="Tags"><span>Tags: </span><a class="post-tag" href="/blog/?tag=ai">AI</a>, <a class="post-tag" href="/blog/?tag=llms">LLMs</a>, <a class="post-tag" href="/blog/?tag=agents">Agents</a>, <a class="post-tag" href="/blog/?tag=local-models">Local models</a>, <a class="post-tag" href="/blog/?tag=ollama">Ollama</a>, <a class="post-tag" href="/blog/?tag=coding">Coding</a></p><h1>Offline Agentic Coding</h1>
-<h3>Published 2026-04-27</h3>
-<p><img src="2026-04-27-offline_agentic_coding.png" alt="offline agentic coding: a handdrawn aeroplane"></p>
-<p>You can use ollama as the backend for claude code!</p>
-<pre><code>ollama launch claude --model</code></pre>
-<p>This allows you to use claude code with local models. I&#x27;m writing this from an airplane with no internet connection.</p>
-<h2>Overall model comparisons</h2>
-<p>Gemma4:e2b did not finish any tasks despite being blazing fast at over 100 tokens per second.</p>
-<p>qwen3-coder-next:q4_K_M actually did reasonably well.  Felt a bit worse than haiku quality but notably slower. Took around half an hour to fill up 75k of context, which is about 40 tokens per second while taking 50-60gb of memory.</p>
-<p>qwen3.6:35b was also fairly reasonable. Did an adaquate job writing a small local data processing job, but was also fairly slow.</p>
-<p>Gemma4:31b felt the most &#x27;claude-like&#x27; in claude code, but was also fairly slow and occasionally required some jostling and interruption.</p>
+<p class="post-tags" aria-label="Tags"><span>Tags: </span><a class="post-tag" href="/blog/?tag=ai">AI</a>, <a class="post-tag" href="/blog/?tag=llms">LLMs</a>, <a class="post-tag" href="/blog/?tag=agents">Agents</a>, <a class="post-tag" href="/blog/?tag=local-models">Local models</a>, <a class="post-tag" href="/blog/?tag=ollama">Ollama</a>, <a class="post-tag" href="/blog/?tag=coding">Coding</a></p><h1>Offline Agentic Coding part 2: OpenCode &amp; Kilocode.</h1>
+<h3>Published 2026-05-07</h3>
+<p><img src="2026-05-07-offline_agentic_coding_2.png" alt="offline agentic coding: a handdrawn clock"></p>
+<h2>OpenCode:</h2>
+<p>Claude code with non-anthropic models feels limited. Conveniently, we can also use OpenCode!</p>
+<pre><code>ollama launch opencode</code></pre>
+<p>OpenCode is like Claude Code but bring your own model.  Overall it&#x27;s very comparable, but is less polished in some ways while feeling more solid in others.</p>
+<h2>Kilocode:</h2>
+<p>Kilocode (kilo.ai) is an agentic coding platform. It&#x27;s now primarily powered by a fork of OpenCode. Their VScode/codium extension is very nice, and offers one of the my favorite views of the context window:</p>
+<p><img src="2026-05-07-kilocode.png" alt="kilocode screenshot"></p>
+<p>Hooking up a local model to the Kilocode vscode extension is straightforwad. Just give it your local server port and you&#x27;re good to go.</p>
+<p>Kilocode is also nice because they have support for a wide range of model providers as well as their own model provider platform, so it&#x27;s seemless to switch between local, open, and proprietary models.</p>
 <h2>Overall</h2>
-<p>I don&#x27;t seriously recommend local agentic coding with LLMs. You need some serious hardware to run decent models and it&#x27;s still slow. It&#x27;s a nice capability to have locally, but it probably isn&#x27;t better than coding by hand. Still very cool to have a computer that can program itself though, and amazing that a consumer device can locally run models and software that matches the original gpt-3 era ChatGPT style experience.</p>
+<p>Overall local models for <strong>coding</strong> are still too slow to be practical on regular hardware, but it&#x27;s nice to have as a capability if the internet goes down, and it&#x27;s still magical to be able to tell me computer to program itself.</p>
 </div>
 </main>
 <nav class="blog-nav">
-  <a href="/blog/2026/04/19/Washington_DC_On_Track_For_Stormy_2026.html">&larr; Washington DC on track for most volatile temperature year since 1959</a>
-  <a href="/blog/2026/05/07/offline-agentic-coding-2.html">Offline Agentic Coding: OpenCode &rarr;</a>
+  <a href="/blog/2026/04/27/offline-agentic-coding.html">&larr; Offline Agentic Coding</a>
+  <span></span>
 </nav>
 <footer>
 <ul>

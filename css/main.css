@@ -45,16 +45,18 @@ img {
     height: auto;
 }
 
-footer {
-    border-top: 4px solid #d5d5d5;
-    font-size: 1em;
-}
 header {
     border-top: 4px solid #d5d5d5;
     font-size: 1em;
 }
 
-ul.posts { 
+article {
+    border-bottom: 4px solid #d5d5d5;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+}
+
+footer { 
     margin: 20px auto 40px; 
     font-size: 1.5em;
 }
