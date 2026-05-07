@@ -50,14 +50,20 @@ header {
     font-size: 1em;
 }
 
+main {
+    border-top: 4px solid #d5d5d5;
+    padding-top: 20px;
+}
+
 article {
     border-bottom: 4px solid #d5d5d5;
     margin-bottom: 20px;
     padding-bottom: 20px;
 }
 
-footer { 
-    margin: 20px auto 40px; 
+footer {
+    border-top: 4px solid #d5d5d5;
+    margin: 20px auto 40px;
     font-size: 1.5em;
 }
 
