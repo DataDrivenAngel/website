@@ -20,7 +20,7 @@
 <p>Local LLM performance frontier: Ollama with M5 Pro<br>
 <img src="2026-05-08-jankmarking.png" alt="my jankmark frontier using ollama"></p>
 <h2>Are janky benchmarks useful?</h2>
-<p>I put together some evals for local benchmarking. I&#x27;m mostly interested in approximately measuring performance versus speed because I don&#x27;t like waiting while my macbook imitiates a jet turbine in noise and temperature and want to get good enough answers locally. For anyhting bigger the cloud is still the move. The problem is my benchmarks are -- to use a human em-dash and quote the kids these days &quot;hella jank&quot;.</p>
+<p>I put together some evals for local benchmarking. I&#x27;m mostly interested in approximately measuring performance versus speed because I don&#x27;t like waiting while my macbook imitiates a jet turbine in noise and temperature and want to get good enough answers locally. For anything bigger the cloud is still the move. The problem is my benchmarks are --- to use a human em-dash and quote the kids these days &quot;hella jank&quot;.</p>
 <p>my janky benchmark questions:</p>
 <ul>
 <li><strong>hello</strong>: Say hello in one sentence.</li>
