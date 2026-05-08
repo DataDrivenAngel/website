@@ -15,10 +15,11 @@
       <guid isPermaLink="true">https://www.williamangel.net/blog/2026/05/08/jankmarking.html</guid>
       <pubDate>Fri, 08 May 2026 00:00:00 +0000</pubDate>
       <description>Are janky benchmarks useful?</description>
-      <content:encoded><![CDATA[<p>#</p>
-<h3>Published 2026-05-08</h3>
-<p><img src="2026-05-08-jankmarking.png" alt="my jankmark frontier using ollama"></p>
+      <content:encoded><![CDATA[<h3>Published 2026-05-08</h3>
 <h1>Jankmarking: Janky Benchmarking</h1>
+<h3>Local LLM performance frontier: Ollama with M5 MBP Pro</h3>
+<p><img src="2026-05-08-jankmarking.png" alt="my jankmark frontier using ollama"></p>
+<h2>Are janky benchmarks useful?</h2>
 <p>I put together some evals for local benchmarking. I&#x27;m mostly interested in approximately measuring performance versus speed because I don&#x27;t like waiting while my macbook imitiates a jet turbine in noise and temperature and want to get good enough answers locally. For anyhting bigger the cloud is still the move. The problem is my benchmarks are -- to use a human em-dash and quote the kids these days &quot;hella jank&quot;.</p>
 <p>my janky benchmark questions:</p>
 <ul>
@@ -73,16 +74,6 @@
 <p>Gemma4:31b felt the most &#x27;claude-like&#x27; in claude code, but was also fairly slow and occasionally required some jostling and interruption.</p>
 <h2>Overall</h2>
 <p>I don&#x27;t seriously recommend local agentic coding with LLMs. You need some serious hardware to run decent models and it&#x27;s still slow. It&#x27;s a nice capability to have locally, but it probably isn&#x27;t better than coding by hand. Still very cool to have a computer that can program itself though, and amazing that a consumer device can locally run models and software that matches the original gpt-3 era ChatGPT style experience.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title>Washington DC on track for most volatile temperature year since 1959</title>
-      <link>https://www.williamangel.net/blog/2026/04/19/Washington_DC_On_Track_For_Stormy_2026.html</link>
-      <guid isPermaLink="true">https://www.williamangel.net/blog/2026/04/19/Washington_DC_On_Track_For_Stormy_2026.html</guid>
-      <pubDate>Sun, 19 Apr 2026 00:00:00 +0000</pubDate>
-      <description>An analysis of 85 years of daily weather data from Reagan National Airport.</description>
-      <content:encoded><![CDATA[<h1>Washington DC on track for most volatile temperature year since 1959</h1>
-<p>An analysis of 85 years of daily weather data from Reagan National Airport.</p>
-<p><img src="Washington_DC_On_Track_For_Stormy_2026_figure2.png" alt="Temperature volatility chart"></p>]]></content:encoded>
     </item>
   </channel>
 </rss>
