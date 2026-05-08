@@ -7,8 +7,32 @@
     <link>https://www.williamangel.net/blog/</link>
     <description>Posts from williamangel.net</description>
     <language>en-us</language>
-    <lastBuildDate>Thu, 07 May 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 08 May 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://www.williamangel.net/rss.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Jankmarking: Janky Benchmarking</title>
+      <link>https://www.williamangel.net/blog/2026/05/08/jankmarking.html</link>
+      <guid isPermaLink="true">https://www.williamangel.net/blog/2026/05/08/jankmarking.html</guid>
+      <pubDate>Fri, 08 May 2026 00:00:00 +0000</pubDate>
+      <description>Are janky benchmarks useful?</description>
+      <content:encoded><![CDATA[<p>#</p>
+<h3>Published 2026-05-08</h3>
+<p><img src="2026-05-08-jankmarking.png" alt="my jankmark frontier using ollama"></p>
+<h1>Jankmarking: Janky Benchmarking</h1>
+<p>I put together some evals for local benchmarking. I&#x27;m mostly interested in approximately measuring performance versus speed because I don&#x27;t like waiting while my macbook imitiates a jet turbine in noise and temperature and want to get good enough answers locally. For anyhting bigger the cloud is still the move. The problem is my benchmarks are -- to use a human em-dash and quote the kids these days &quot;hella jank&quot;.</p>
+<p>my janky benchmark questions:</p>
+<ul>
+<li><strong>hello</strong>: Say hello in one sentence.</li>
+<li><strong>haiku</strong>: Write a haiku about autumn leaves.</li>
+<li><strong>reasoning</strong>: If a train travels 60 mph for 2.5 hours, how far does it go? Show your work.</li>
+<li><strong>summarize</strong>: Summarize the following in two sentences: The Apollo program was a NASA spaceflight program that successfully landed humans on the Moon from 1969 to 1972, using the Saturn V rocket and Command/Service Module.</li>
+<li><strong>code_simple</strong>: Write a Python function that returns the nth Fibonacci number.</li>
+<li><strong>code_complex</strong>: Implement a thread-safe LRU cache in Python with O(1) get and put. Include type hints and a brief docstring.</li>
+</ul>
+<p>These aren&#x27;t very good. They&#x27;re half AI generated. The summarization one is a single sentence and is actually backwards asking for a summary longer than the input sentence... (it used to be longer but I think it got lost at some point when I copy and pasted it. Never made it into version control... )</p>
+<p>And yet, these are directionally correct. The better models cluster together scorewise.</p>
+<p>For serious work, make sure your bench marks aren&#x27;t jankmarks.</p>]]></content:encoded>
+    </item>
     <item>
       <title>Offline Agentic Coding: OpenCode</title>
       <link>https://www.williamangel.net/blog/2026/05/07/offline-agentic-coding-2.html</link>

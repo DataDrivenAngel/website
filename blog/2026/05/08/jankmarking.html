@@ -11,18 +11,18 @@ function gtag(){ dataLayer.push(arguments); }
 gtag('js', new Date());
 gtag('config', 'G-SPPPPB9KSW');
 </script>
-<meta name="Description" content="Limitations of offline coding">
-<meta property="og:title" content="Offline Agentic Coding: OpenCode">
-<meta property="og:description" content="Limitations of offline coding">
-<meta property="og:image" content="https://www.williamangel.net/blog/2026/05/07/2026-05-07-offline_agentic_coding_2.png">
-<meta property="og:url" content="https://www.williamangel.net/blog/2026/05/07/offline-agentic-coding-2.html">
+<meta name="Description" content="Are janky benchmarks useful?">
+<meta property="og:title" content="Jankmarking: Janky Benchmarking">
+<meta property="og:description" content="Are janky benchmarks useful?">
+<meta property="og:image" content="https://www.williamangel.net/blog/2026/05/08/2026-05-08-jankmarking.png">
+<meta property="og:url" content="https://www.williamangel.net/blog/2026/05/08/jankmarking.html">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="https://www.williamangel.net">
 <meta name="twitter:creator" content="@DataDrivenAngel">
-<meta name="twitter:title" content="Offline Agentic Coding: OpenCode">
-<meta name="twitter:description" content="Limitations of offline coding">
-<meta name="twitter:image" content="https://www.williamangel.net/blog/2026/05/07/2026-05-07-offline_agentic_coding_2.png">
-<title>Offline Agentic Coding: OpenCode</title>
+<meta name="twitter:title" content="Jankmarking: Janky Benchmarking">
+<meta name="twitter:description" content="Are janky benchmarks useful?">
+<meta name="twitter:image" content="https://www.williamangel.net/blog/2026/05/08/2026-05-08-jankmarking.png">
+<title>Jankmarking: Janky Benchmarking</title>
 <link rel="stylesheet" type="text/css" href="/css/main.css">
 <link rel="alternate" type="application/rss+xml" title="Will Angel's Blog" href="/rss.xml">
 </head>
@@ -125,25 +125,28 @@ gtag('config', 'G-SPPPPB9KSW');
 </nav>
 <main>
 <div class="container">
-<p class="post-tags" aria-label="Tags"><span>Tags: </span><a class="post-tag" href="/blog/?tag=ai">AI</a>, <a class="post-tag" href="/blog/?tag=llms">LLMs</a>, <a class="post-tag" href="/blog/?tag=agents">Agents</a>, <a class="post-tag" href="/blog/?tag=local-models">Local models</a>, <a class="post-tag" href="/blog/?tag=ollama">Ollama</a>, <a class="post-tag" href="/blog/?tag=coding">Coding</a></p><h1>Offline Agentic Coding part 2: OpenCode &amp; Kilocode.</h1>
-<h3>Published 2026-05-07</h3>
-<p><img src="2026-05-07-offline_agentic_coding_2.png" alt="offline agentic coding: a handdrawn clock"></p>
-<h2>OpenCode:</h2>
-<p>Claude code with non-anthropic models feels limited. Conveniently, we can also use OpenCode!</p>
-<pre><code>ollama launch opencode</code></pre>
-<p>OpenCode is like Claude Code but bring your own model.  Overall it&#x27;s very comparable, but is less polished in some ways while feeling more solid in others.</p>
-<h2>Kilocode:</h2>
-<p>Kilocode (kilo.ai) is an agentic coding platform. It&#x27;s now primarily powered by a fork of OpenCode. Their VScode/codium extension is very nice, and offers one of the my favorite views of the context window:</p>
-<p><img src="2026-05-07-kilocode.png" alt="kilocode screenshot"></p>
-<p>Hooking up a local model to the Kilocode vscode extension is straightforwad. Just give it your local server port and you&#x27;re good to go.</p>
-<p>Kilocode is also nice because they have support for a wide range of model providers as well as their own model provider platform, so it&#x27;s seemless to switch between local, open, and proprietary models.</p>
-<h2>Overall</h2>
-<p>Overall local models for <strong>coding</strong> are still too slow to be practical on regular hardware, but it&#x27;s nice to have as a capability if the internet goes down, and it&#x27;s still magical to be able to tell me computer to program itself.</p>
+<p class="post-tags" aria-label="Tags"><span>Tags: </span><a class="post-tag" href="/blog/?tag=ai">AI</a>, <a class="post-tag" href="/blog/?tag=llms">LLMs</a>, <a class="post-tag" href="/blog/?tag=benchmarking">Benchmarking</a>, <a class="post-tag" href="/blog/?tag=jankmarking">Jankmarking</a>, <a class="post-tag" href="/blog/?tag=evals">Evals</a>, <a class="post-tag" href="/blog/?tag=local-models">local models</a></p><p>#</p>
+<h3>Published 2026-05-08</h3>
+<p><img src="2026-05-08-jankmarking.png" alt="my jankmark frontier using ollama"></p>
+<h1>Jankmarking: Janky Benchmarking</h1>
+<p>I put together some evals for local benchmarking. I&#x27;m mostly interested in approximately measuring performance versus speed because I don&#x27;t like waiting while my macbook imitiates a jet turbine in noise and temperature and want to get good enough answers locally. For anyhting bigger the cloud is still the move. The problem is my benchmarks are -- to use a human em-dash and quote the kids these days &quot;hella jank&quot;.</p>
+<p>my janky benchmark questions:</p>
+<ul>
+<li><strong>hello</strong>: Say hello in one sentence.</li>
+<li><strong>haiku</strong>: Write a haiku about autumn leaves.</li>
+<li><strong>reasoning</strong>: If a train travels 60 mph for 2.5 hours, how far does it go? Show your work.</li>
+<li><strong>summarize</strong>: Summarize the following in two sentences: The Apollo program was a NASA spaceflight program that successfully landed humans on the Moon from 1969 to 1972, using the Saturn V rocket and Command/Service Module.</li>
+<li><strong>code_simple</strong>: Write a Python function that returns the nth Fibonacci number.</li>
+<li><strong>code_complex</strong>: Implement a thread-safe LRU cache in Python with O(1) get and put. Include type hints and a brief docstring.</li>
+</ul>
+<p>These aren&#x27;t very good. They&#x27;re half AI generated. The summarization one is a single sentence and is actually backwards asking for a summary longer than the input sentence... (it used to be longer but I think it got lost at some point when I copy and pasted it. Never made it into version control... )</p>
+<p>And yet, these are directionally correct. The better models cluster together scorewise.</p>
+<p>For serious work, make sure your bench marks aren&#x27;t jankmarks.</p>
 </div>
 </main>
 <nav class="blog-nav">
-  <a href="/blog/2026/04/27/offline-agentic-coding.html">&larr; Offline Agentic Coding</a>
-  <a href="/blog/2026/05/08/jankmarking.html">Jankmarking: Janky Benchmarking &rarr;</a>
+  <a href="/blog/2026/05/07/offline-agentic-coding-2.html">&larr; Offline Agentic Coding: OpenCode</a>
+  <span></span>
 </nav>
 <footer>
 <ul>
