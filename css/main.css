@@ -168,3 +168,24 @@ ul.posts li {
     color: #666;
     margin: 0 0 12px;
 }
+
+/* Markdown content lists */
+.container > ul,
+.container > ol {
+    font-size: 1.5em;
+    line-height: 1.4em;
+    color: #333;
+    padding-left: 1.5em;
+    margin: 1em 0;
+}
+.container > ul li,
+.container > ol li {
+    margin-bottom: 0.4em;
+}
+.container > ul ul,
+.container > ul ol,
+.container > ol ul,
+.container > ol ol {
+    font-size: 1em;
+    margin: 0.2em 0;
+}
