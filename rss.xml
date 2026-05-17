@@ -10,14 +10,14 @@
     <lastBuildDate>Sun, 17 May 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://www.williamangel.net/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
-      <title>Offline Agentic Coding: OpenCode</title>
+      <title>Apple Silicon costs more than OpenRouter</title>
       <link>https://www.williamangel.net/blog/2026/05/17/offline-llm-energy-use.html</link>
       <guid isPermaLink="true">https://www.williamangel.net/blog/2026/05/17/offline-llm-energy-use.html</guid>
       <pubDate>Sun, 17 May 2026 00:00:00 +0000</pubDate>
       <description>Local LLMs can be very very cheap</description>
       <content:encoded><![CDATA[<h1>Offline Agentic Coding part 3: Apple Silicon costs more than OpenRouter.</h1>
 <h3>Published 2026-05-17</h3>
-<p><img src="2026-05-17-offline-llm-energy-use.md.png" alt="Apple silicon costs more than open router. Spreadsheet showing tokens per second and costs to show overall cost per million tokens."></p>
+<p><img src="2026-05-17-offline-llm-energy-use.png" alt="Apple silicon costs more than open router. Spreadsheet showing tokens per second and costs to show overall cost per million tokens."></p>
 <p>Apple silicon costs more than OpenRouter.</p>
 <p>At ~50-100 watts under load, and ~$0.20 per kWh, my M5 MacbookPro will cost a few cents per hour. Accelerated depreciation (if any) from shortening the lifespan of the device will be more expensive than the electricity.  At a few tens of tokens per second this works out to ammortized costs of ~$1.50 per million tokens. Openrouter for comparable models is 1/3rd the price and ~2x the speed.</p>
 <h2>Electricity</h2>
