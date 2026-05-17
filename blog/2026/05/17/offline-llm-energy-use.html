@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SPPPPB9KSW"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){ dataLayer.push(arguments); }
+gtag('js', new Date());
+gtag('config', 'G-SPPPPB9KSW');
+</script>
+<meta name="Description" content="Local LLMs can be very very cheap">
+<meta property="og:title" content="Offline Agentic Coding: OpenCode">
+<meta property="og:description" content="Local LLMs can be very very cheap">
+<meta property="og:image" content="https://www.williamangel.net/blog/2026/05/17/2026-05-17-offline_agentic_coding_2.png">
+<meta property="og:url" content="https://www.williamangel.net/blog/2026/05/17/offline-llm-energy-use.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="https://www.williamangel.net">
+<meta name="twitter:creator" content="@DataDrivenAngel">
+<meta name="twitter:title" content="Offline Agentic Coding: OpenCode">
+<meta name="twitter:description" content="Local LLMs can be very very cheap">
+<meta name="twitter:image" content="https://www.williamangel.net/blog/2026/05/17/2026-05-17-offline_agentic_coding_2.png">
+<title>Offline Agentic Coding: OpenCode</title>
+<link rel="stylesheet" type="text/css" href="/css/main.css">
+<link rel="alternate" type="application/rss+xml" title="Will Angel's Blog" href="/rss.xml">
+</head>
+<body>
+<style>
+.cookie-popup-overlay {
+	display: none;
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	z-index: 9999;
+	animation: slideInFromBottom 0.4s ease-out;
+}
+.cookie-popup {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	padding: 15px 20px;
+	border-radius: 12px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+	text-align: center;
+	max-width: 280px;
+	position: relative;
+}
+.cookie-icon {
+	font-size: 32px;
+	margin-bottom: 8px;
+	animation: bounce 1s infinite;
+}
+.cookie-popup h2 {
+	color: white;
+	font-family: 'Helvetica', 'Arial', 'Sans-Serif';
+	font-size: 0.95em;
+	margin: 0 0 10px 0;
+}
+.cookie-popup-button {
+	display: inline-block;
+	background-color: #ffd700;
+	color: #333;
+	padding: 8px 20px;
+	border-radius: 50px;
+	text-decoration: none;
+	font-family: 'Helvetica', 'Arial', 'Sans-Serif';
+	font-weight: bold;
+	font-size: 0.9em;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+.cookie-popup-button:hover {
+	background-color: #ffed4e;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(255, 215, 0, 0.6);
+}
+.cookie-popup-close {
+	position: absolute;
+	top: 8px;
+	right: 10px;
+	color: white;
+	font-size: 20px;
+	cursor: pointer;
+	background: none;
+	border: none;
+	opacity: 0.7;
+	transition: opacity 0.3s ease;
+	line-height: 1;
+}
+.cookie-popup-close:hover {
+	opacity: 1;
+}
+.cookie-popup p {
+	color: white;
+	font-family: 'Helvetica', 'Arial', 'Sans-Serif';
+	font-size: 0.75em;
+	margin: 8px 0 0 0;
+	opacity: 0.9;
+}
+@keyframes slideInFromBottom {
+	from { transform: translateY(100px); opacity: 0; }
+	to { transform: translateY(0); opacity: 1; }
+}
+@keyframes bounce {
+	0%, 100% { transform: translateY(0); }
+	50% { transform: translateY(-5px); }
+}
+</style>
+<div class="cookie-popup-overlay" id="cookiePopupOverlay">
+<div class="cookie-popup">
+<button class="cookie-popup-close" onclick="closeCookiePopup()">&times;</button>
+<div class="cookie-icon">🍪</div>
+<h2>Play my cookie clicker game!</h2>
+<a href="/clicker/game/index.html" class="cookie-popup-button">Let's Play!</a>
+<p>Also this website uses google analytics</p>
+</div>
+</div>
+<nav>
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/about">About</a></li>
+<li><a href="/book">Book</a></li>
+<li><a href="/blog">Blog</a></li>
+</ul>
+</nav>
+<main>
+<div class="container">
+<p class="post-tags" aria-label="Tags"><span>Tags: </span><a class="post-tag" href="/blog/?tag=ai">AI</a>, <a class="post-tag" href="/blog/?tag=llms">LLMs</a>, <a class="post-tag" href="/blog/?tag=agents">Agents</a>, <a class="post-tag" href="/blog/?tag=local-models">Local models</a>, <a class="post-tag" href="/blog/?tag=coding">Coding</a></p><h1>Offline Agentic Coding part 3: Apple Silicon costs more than OpenRouter.</h1>
+<h3>Published 2026-05-17</h3>
+<p><img src="2026-05-17-offline-llm-energy-use.md.png" alt="Apple silicon costs more than open router. Spreadsheet showing tokens per second and costs to show overall cost per million tokens."></p>
+<p>Apple silicon costs more than OpenRouter.</p>
+<p>At ~50-100 watts under load, and ~$0.20 per kWh, my M5 MacbookPro will cost a few cents per hour. Accelerated depreciation (if any) from shortening the lifespan of the device will be more expensive than the electricity.  At a few tens of tokens per second this works out to ammortized costs of ~$1.50 per million tokens. Openrouter for comparable models is 1/3rd the price and ~2x the speed.</p>
+<h2>Electricity</h2>
+<p>In Northern Virginia my last electricity bill worked out to $0.18 per kilowatt hour. Let&#x27;s round up to $0.20 per kWh.</p>
+<p>EIA has average residential costs for 2025 at $0.1730 per kWh in the US.<br>
+https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=table_5_03</p>
+<p>At ~50-100 watts and $0.18/kWh that&#x27;s $0.009 or $0.018 per hour. $0.02 per hour. <strong>$0.48 cents per day for the electricity to be running inference at 100%.</strong></p>
+<h2>Hardware</h2>
+<p>A 14 inch MBP with M5 Max and 64 gigs of ram is currently listed as $4299 on the apple website. 128 gigs will cost you more but 64 gigs should run a model like Gemma 4 31b, which is almost anthropic sonnet levels of performance.</p>
+<p>For cost allocation, let&#x27;s consider that this hardware will last 3, 5, or 10 years.  The cost per year is $1433, $860, or $430 respectively.</p>
+<p>The hourly cost over 3, 5, and 10 years is thus:</p>
+<ul>
+<li>$0.16358</li>
+<li>$0.09815</li>
+<li>$0.04908</li>
+</ul>
+<p>Depending on useful lifespan, I think 5 years is a reasonable estimate for normal use. 7 or 10 is very plausible. At maxed out inference 3 years may be a reasonable estimate as well.</p>
+<h2>Tokenomics</h2>
+<p>The big question is how many tokens per hour can you get out of a local model. My M5 Max testing seems to be in the 10-40 tokens per second range for a serious model like Gemma4:31b. At 10 tokens per second that&#x27;s 36000 tokens per hour.</p>
+<p>36000 tokens per hour across our 3-10 year lifespan at $0.18 per kwh gives a price per million tokens of $1.61 to $4.79 on the high end.</p>
+<p>At 40 tokens per second that&#x27;s 144000 tokens per hour which gets you to $0.40 to $1.20 per million tokens.</p>
+<p>For apple silicon, the hardware cost dominates.</p>
+<h2>OpenRouter</h2>
+<p>OpenRouter has Gemma4 31b at ~38-50 cents per million tokens. This means that on the optimistic side (50 watts, 40 tokens per second, and 10 years) the pro max is as cheap as openrouter. On the pessimistic side (100 watts and 3 years at 10 tokens per second) the pro max is 10x the cost. I think ~3x the cost per million tokens is likely the right number for local inference on the pro max from an accounting perspective.</p>
+<h2>Conclusion</h2>
+<p>Speed of inference is the biggest factor here though for most cases. Local inference is slower than cloud inference. Some of the gemma 4 providers on openrouter get up to 60-70 tokens per second, which is 3-7 times faster than what I&#x27;m seeing with the pro max (~10-20 tokens per second). For a human employee with a work laptop, their salary costs are going to be ~1000x the cost of the tokens they can generate locally. Throwing money at anthropic makes more sense in this context.</p>
+<p>It&#x27;s still wild that a consumer device can run models that are close to anthropic sonnet levels of performance.</p>
+</div>
+</main>
+<nav class="blog-nav">
+  <a href="/blog/2026/05/08/jankmarking.html">&larr; Jankmarking: Janky Benchmarking</a>
+  <span></span>
+</nav>
+<footer>
+<ul>
+<li><a href="https://twitter.com/DataDrivenAngel">Twitter</a></li>
+<li><a href="https://www.linkedin.com/in/william-angel/">LinkedIn</a></li>
+<li><a href="https://github.com/DataDrivenAngel">GitHub</a></li>
+</ul>
+</footer>
+<script>
+function checkFirstVisit() {
+    const hasVisited = localStorage.getItem('hasVisitedBefore');
+    if (!hasVisited) {
+        setTimeout(() => {
+            document.getElementById('cookiePopupOverlay').style.display = 'block';
+        }, 500);
+    }
+}
+function closeCookiePopup() {
+    document.getElementById('cookiePopupOverlay').style.display = 'none';
+    localStorage.setItem('hasVisitedBefore', 'true');
+}
+window.addEventListener('load', checkFirstVisit);
+</script>
+</body>
+</html>
