@@ -10,14 +10,15 @@
     <lastBuildDate>Wed, 20 May 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://www.williamangel.net/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
-      <title>Claude.AI Pro Plan quotas too small for deep research.</title>
+      <title>Claude.AI Pro Plan quotas too small for deep research</title>
       <link>https://www.williamangel.net/blog/2026/05/20/ClaudeAI-Pro-Plan-Gives-Single-Deep-Research.html</link>
       <guid isPermaLink="true">https://www.williamangel.net/blog/2026/05/20/ClaudeAI-Pro-Plan-Gives-Single-Deep-Research.html</guid>
       <pubDate>Wed, 20 May 2026 00:00:00 +0000</pubDate>
-      <description>The Claude.AI Pro Plan doesn't consistently give you a single deep research!</description>
-      <content:encoded><![CDATA[<h1>Claude.AI Pro Plan quotas too small for deep research.</h1>
+      <description>The Claude.AI Pro Plan doesn't consistently give you a single research mode question!</description>
+      <content:encoded><![CDATA[<h1>Claude.AI Pro Plan quotas too small for deep research</h1>
 <h3>Published 2026-05-20</h3>
 <p><img src="2026-05-20-usage-limit-reached.png" alt="Usage limits reached!"></p>
+<h2>Usage limits are too small for deep research</h2>
 <p>The $20/month Claude pro plan gives me at most 1 successful research mode question per session before I hit the usage limits, and have twice seen a single research question fail to finish because it burns the entire session usage. Even when using Sonnet.</p>
 <p>My suggestions if anyone at anthropic sees this: Add some kind of hint to Claude to wrap things up as usage starts coming to an end, add some kind of UI hint to just use web search more often, and maybe allow soft overages for session usage?</p>
 <h2>The setup:</h2>
@@ -27,7 +28,7 @@
 <p>I had hit my limits before it could finish!</p>
 <p>Well, 80% of my limits... Which is also weird because last time I checked even dumb local models will confirm that 80% is not 100%... There might be a bug?</p>
 <p><img src="2026-05-20-usage-limit.png" alt="80% is 100%??"></p>
-<h3>Take 2.</h3>
+<h2>Take 2.</h2>
 <p>So I tried again a few hours later with the same prompt. No other connectors, no excessive MCP servers or customizations to burn context. No other usage in that session.</p>
 <p><img src="2026-05-20-take-2.png" alt="New research prompt"></p>
 <p>It worked this time, but used 56% of my usage.</p>
