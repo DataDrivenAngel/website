@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAILGUN // Force &amp; Torque Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#070b0c; --panel:#0e1517; --panel2:#121b1d; --line:#1c2a2c;
+    --ink:#c8d6d4; --dim:#6f8480; --grid:#13211f;
+    --fwd:#ffb000;      /* launch / forward  */
+    --rec:#ff4d52;      /* recoil / backward */
+    --blow:#34d0e6;     /* rail blowout      */
+    --cur:#7fe3a0;      /* current sense     */
+    --hot:#ffd24d;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:
+    radial-gradient(1200px 700px at 70% -10%, #0d181a 0%, var(--bg) 60%);
+    color:var(--ink);font-family:"IBM Plex Mono",monospace;
+    -webkit-text-size-adjust:100%;}
+  body{padding:18px 14px 40px;}
+  .wrap{max-width:1080px;margin:0 auto;}
+  h1{font-family:"Chakra Petch",sans-serif;font-weight:700;letter-spacing:.06em;
+     font-size:clamp(22px,5.5vw,34px);margin:0 0 2px;color:#eef6f4;
+     text-transform:uppercase;}
+  h1 .ac{color:var(--fwd);}
+  .sub{color:var(--dim);font-size:12.5px;letter-spacing:.04em;margin:0 0 16px;
+       border-bottom:1px solid var(--line);padding-bottom:12px;}
+  .grid{display:flex;flex-wrap:wrap;gap:14px;}
+  .col{flex:1 1 420px;min-width:280px;}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));
+        border:1px solid var(--line);border-radius:10px;padding:14px;
+        box-shadow:inset 0 1px 0 #ffffff0a, 0 10px 30px #0008;}
+  .card h2{font-family:"Chakra Petch",sans-serif;font-size:12px;letter-spacing:.16em;
+           text-transform:uppercase;color:var(--dim);margin:0 0 10px;font-weight:600;}
+  canvas{width:100%;display:block;border-radius:6px;background:
+    repeating-linear-gradient(0deg,transparent 0 23px,var(--grid) 23px 24px),
+    repeating-linear-gradient(90deg,transparent 0 23px,var(--grid) 23px 24px),
+    #060a0b;}
+  .ctrl{margin:13px 0;}
+  .ctrl label{display:flex;justify-content:space-between;font-size:12.5px;
+              margin-bottom:6px;align-items:baseline;}
+  .ctrl .val{font-family:"Chakra Petch",sans-serif;font-weight:700;color:var(--hot);
+             font-size:14px;}
+  input[type=range]{width:100%;-webkit-appearance:none;height:5px;border-radius:4px;
+    background:linear-gradient(90deg,var(--fwd),#5a4400);outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;
+    border-radius:50%;background:#0b1112;border:2px solid var(--fwd);cursor:pointer;
+    box-shadow:0 0 0 4px #ffb00022;}
+  input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
+    background:#0b1112;border:2px solid var(--fwd);cursor:pointer;}
+  .readout{display:grid;grid-template-columns:1fr auto;gap:7px 10px;font-size:13px;
+           align-items:baseline;}
+  .readout .k{color:var(--dim);}
+  .readout .v{font-family:"Chakra Petch",sans-serif;font-weight:700;text-align:right;
+              font-variant-numeric:tabular-nums;}
+  .tag{display:inline-block;width:11px;height:11px;border-radius:2px;
+       vertical-align:-1px;margin-right:6px;}
+  .sep{grid-column:1/-1;border-top:1px dashed var(--line);margin:3px 0;}
+  .verdict{margin-top:14px;border-left:3px solid var(--fwd);}
+  .verdict h2{color:var(--fwd);}
+  .verdict p{font-size:13px;line-height:1.55;margin:8px 0;color:var(--ink);}
+  .verdict b{color:#fff;}
+  .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;
+        font-weight:700;letter-spacing:.05em;font-family:"Chakra Petch",sans-serif;}
+  .pill.yes{background:#ff4d5222;color:var(--rec);border:1px solid #ff4d5255;}
+  .pill.no{background:#34d0e622;color:var(--blow);border:1px solid #34d0e655;}
+  .legend{font-size:11.5px;color:var(--dim);margin-top:8px;line-height:1.7;}
+  .note{font-size:11.5px;color:var(--dim);line-height:1.5;margin-top:10px;
+        border-top:1px solid var(--line);padding-top:9px;}
+  .foot{color:var(--dim);font-size:11px;margin-top:18px;text-align:center;
+        letter-spacing:.03em;}
+  .miniwrap{margin-top:6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Rail<span class="ac">gun</span> // Force &amp; Torque Bench</h1>
+  <p class="sub">Top-down 2D filament model · Biot–Savart self-field solver · settles the question: where does the recoil go, and does an offset breech twist the gun?</p>
+
+  <div class="grid">
+    <!-- LEFT: viewport + controls -->
+    <div class="col">
+      <div class="card">
+        <h2>Plan view — current loop &amp; force vectors</h2>
+        <canvas id="view" width="720" height="430"></canvas>
+        <div class="legend">
+          <span class="tag" style="background:var(--cur)"></span>current path &nbsp;
+          <span class="tag" style="background:var(--fwd)"></span>launch (fwd) &nbsp;
+          <span class="tag" style="background:var(--rec)"></span>recoil (back) &nbsp;
+          <span class="tag" style="background:var(--blow)"></span>rail blowout
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h2>Inputs</h2>
+        <div class="ctrl">
+          <label>Drive current <span class="val"><span id="vI">800</span> kA</span></label>
+          <input id="I" type="range" min="50" max="2000" step="10" value="800">
+        </div>
+        <div class="ctrl">
+          <label>Rail gap (caliber) <span class="val"><span id="vG">50</span> mm</span></label>
+          <input id="G" type="range" min="10" max="120" step="1" value="50">
+        </div>
+        <div class="ctrl">
+          <label>Armature position (barrel len) <span class="val"><span id="vX">0.80</span> m</span></label>
+          <input id="X" type="range" min="0.1" max="2.0" step="0.01" value="0.80">
+        </div>
+        <div class="ctrl">
+          <label>Breech offset from bore axis <span class="val"><span id="vH">0</span> mm</span></label>
+          <input id="H" type="range" min="-150" max="150" step="1" value="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: numbers + verdict -->
+    <div class="col">
+      <div class="card">
+        <h2>Solver output (per conductor)</h2>
+        <div class="readout">
+          <div class="k"><span class="tag" style="background:var(--fwd)"></span>Launch force on armature →</div>
+          <div class="v" id="oFwd" style="color:var(--fwd)">—</div>
+
+          <div class="k"><span class="tag" style="background:var(--rec)"></span>Recoil force at breech ←</div>
+          <div class="v" id="oRec" style="color:var(--rec)">—</div>
+
+          <div class="k"><span class="tag" style="background:var(--blow)"></span>Blowout per rail ⇅</div>
+          <div class="v" id="oBlow" style="color:var(--blow)">—</div>
+
+          <div class="sep"></div>
+
+          <div class="k">Net force on whole loop</div>
+          <div class="v" id="oNet">—</div>
+          <div class="k">Closed-form check ½·L′·I²</div>
+          <div class="v" id="oCF">—</div>
+
+          <div class="sep"></div>
+
+          <div class="k"><b>Turning moment (couple)</b></div>
+          <div class="v" id="oTau" style="color:var(--hot)">—</div>
+          <div class="k">Rotation sense</div>
+          <div class="v" id="oDir">—</div>
+        </div>
+        <div class="miniwrap">
+          <canvas id="mini" width="430" height="150"></canvas>
+          <div class="legend">torque vs. breech offset — linear through the origin. Flat zero line = no offset, no twist.</div>
+        </div>
+      </div>
+
+      <div class="card verdict">
+        <h2>The verdict <span id="pill" class="pill no">NO TORQUE</span></h2>
+        <p><b>Recoil is felt at the breech, not the barrel.</b> The breech crossbar carries current <i>antiparallel</i> to the armature, so the two repel: the armature is shoved toward the muzzle and the breech is shoved backward by an equal force. The rails themselves only feel sideways "blowout" — they contribute essentially nothing to the axial recoil.</p>
+        <p id="vTxt">With the breech on the bore axis, the launch force and the recoil force are collinear → they cancel as a straight-back kick with <b>no net couple</b>. The gun slides back without yawing.</p>
+        <p class="note">Honest fine print for the pedants: the EM forces are internal, so the closed circuit can't spin <i>itself</i> up — net force and net torque over the entire loop are ≈0 (see "Net force" above). The twist appears the instant the projectile separates: the structure is left with a backward push applied at the offset breech, off the bore line → a couple τ = F·d. How fast it actually rotates depends on the gun's moment of inertia and where it's mounted; the <i>turning moment itself</i> is unambiguous. Same effect as a cannon whose recoil rod sits off the bore axis → muzzle climb.</p>
+      </div>
+    </div>
+  </div>
+  <p class="foot">Method: each conductor discretised into filament elements; B from every <i>other</i> element via Biot–Savart (μ₀/4π=1e-7), F = I·dL×B. Forces scale as I². Idealised thin filaments — directions &amp; ratios are exact, absolute magnitudes are order-of-magnitude.</p>
+</div>
+
+<script>
+const MU = 1e-7;            // mu0 / 4pi
+const M  = 44;             // filament elements per conductor
+
+// Build the directed current loop. Current flows pts in listed order.
+// Geometry in metres. hoff = vertical offset of the breech bar from bore axis.
+function conductors(gap, xa, hoff){
+  const hg = gap/2;
+  return [
+    {role:'leadB',    p:[[0,-hg],[0,hoff-hg]]},     // bottom lead up to breech bar
+    {role:'breech',   p:[[0,hoff-hg],[0,hoff+hg]]}, // breech crossbar (+y)
+    {role:'leadT',    p:[[0,hoff+hg],[0,hg]]},      // top lead back to rail
+    {role:'railT',    p:[[0,hg],[xa,hg]]},          // top rail (+x)
+    {role:'armature', p:[[xa,hg],[xa,-hg]]},        // armature (-y)
+    {role:'railB',    p:[[xa,-hg],[0,-hg]]}         // bottom rail (-x)
+  ];
+}
+
+function discretise(cs){
+  const e=[];
+  cs.forEach((c,ci)=>{
+    const [a,b]=c.p, dx=b[0]-a[0], dy=b[1]-a[1];
+    for(let k=0;k<M;k++){
+      const t0=k/M, t1=(k+1)/M;
+      const x0=a[0]+dx*t0, y0=a[1]+dy*t0, x1=a[0]+dx*t1, y1=a[1]+dy*t1;
+      const lx=x1-x0, ly=y1-y0;
+      if(Math.abs(lx)<1e-12 && Math.abs(ly)<1e-12) continue; // degenerate (zero-length lead)
+      e.push({x:(x0+x1)/2, y:(y0+y1)/2, lx, ly, ci, role:c.role});
+    }
+  });
+  return e;
+}
+
+// Solve forces (Newtons) on each element given current I (Amps).
+function solve(cs, I){
+  const e = discretise(cs);
+  const F = e.map(()=>({fx:0,fy:0}));
+  for(let i=0;i<e.length;i++){
+    const ti=e[i]; let Bz=0;
+    for(let j=0;j<e.length;j++){
+      const s=e[j];
+      if(s.ci===ti.ci) continue;              // skip same conductor (straight self-force = 0)
+      const Rx=ti.x-s.x, Ry=ti.y-s.y;
+      const r2=Rx*Rx+Ry*Ry; if(r2<1e-10) continue;
+      const r=Math.sqrt(r2), r3=r2*r;
+      // dBz = (mu0/4pi) I (dl x R)_z / r^3 ;  (dl x R)_z = lx*Ry - ly*Rx
+      Bz += MU*I*(s.lx*Ry - s.ly*Rx)/r3;
+    }
+    // F = I dl x B,  B = Bz z^  ->  Fx = I*ly*Bz , Fy = -I*lx*Bz
+    F[i].fx = I*ti.ly*Bz;
+    F[i].fy = -I*ti.lx*Bz;
+  }
+  // aggregate by role + totals
+  const sum={};
+  cs.forEach(c=>{ sum[c.role]={fx:0,fy:0,x:0,y:0,w:0}; }); // pre-init so zero-length leads still exist
+  let netx=0,nety=0;
+  e.forEach((el,i)=>{
+    const r=el.role; sum[r]=sum[r]||{fx:0,fy:0,x:0,y:0,w:0};
+    sum[r].fx+=F[i].fx; sum[r].fy+=F[i].fy;
+    const mag=Math.hypot(F[i].fx,F[i].fy);
+    sum[r].x+=el.x*mag; sum[r].y+=el.y*mag; sum[r].w+=mag;
+    netx+=F[i].fx; nety+=F[i].fy;
+  });
+  for(const k in sum){ if(sum[k].w>0){sum[k].x/=sum[k].w; sum[k].y/=sum[k].w;} }
+  return {e,F,sum,netx,nety};
+}
+
+// ---- formatting ----
+function fN(v){ const a=Math.abs(v);
+  if(a>=1e6) return (v/1e6).toFixed(2)+' MN';
+  if(a>=1e3) return (v/1e3).toFixed(2)+' kN';
+  if(a>=1)   return v.toFixed(1)+' N';
+  return v.toFixed(3)+' N';
+}
+function fNm(v){ const a=Math.abs(v);
+  if(a>=1e3) return (v/1e3).toFixed(2)+' kN·m';
+  if(a>=1)   return v.toFixed(1)+' N·m';
+  return v.toFixed(3)+' N·m';
+}
+
+// ---- canvas helpers ----
+const view=document.getElementById('view'), vx=view.getContext('2d');
+const mini=document.getElementById('mini'), mx=mini.getContext('2d');
+
+function arrow(c,x0,y0,x1,y1,col,w){
+  c.strokeStyle=col; c.fillStyle=col; c.lineWidth=w;
+  c.beginPath(); c.moveTo(x0,y0); c.lineTo(x1,y1); c.stroke();
+  const a=Math.atan2(y1-y0,x1-x0), h=6+w;
+  c.beginPath(); c.moveTo(x1,y1);
+  c.lineTo(x1-h*Math.cos(a-0.4), y1-h*Math.sin(a-0.4));
+  c.lineTo(x1-h*Math.cos(a+0.4), y1-h*Math.sin(a+0.4));
+  c.closePath(); c.fill();
+}
+
+function draw(state){
+  const {cs, sol, xa, gap, hoff} = state;
+  const W=view.width, H=view.height, pad=54;
+  // world bounds
+  const yspan = Math.max(gap*0.5 + Math.abs(hoff), gap)+gap*0.6;
+  const xmin=-0.08*xa-0.02, xmax=xa+0.12*xa;
+  const ymin=-yspan, ymax=yspan;
+  const sx=(W-2*pad)/(xmax-xmin), sy=(H-2*pad)/(ymax-ymin);
+  const s=Math.min(sx,sy);
+  const ox=pad-xmin*s, oy=H/2 + ((ymax+ymin)/2)*s; // center bore vertically-ish
+  const TX=x=>ox+x*s, TY=y=>oy - y*s;
+
+  vx.clearRect(0,0,W,H);
+  // bore axis
+  vx.strokeStyle='#2a3d3f'; vx.setLineDash([6,6]); vx.lineWidth=1;
+  vx.beginPath(); vx.moveTo(TX(xmin),TY(0)); vx.lineTo(TX(xmax),TY(0)); vx.stroke();
+  vx.setLineDash([]);
+  vx.fillStyle='#39504f'; vx.font='10px "IBM Plex Mono"';
+  vx.fillText('bore axis', TX(xa*0.62), TY(0)-5);
+
+  // conductors
+  const colOf={railT:'#caa24a',railB:'#caa24a',armature:'#ffb000',breech:'#ff6b6f',leadT:'#ff6b6f',leadB:'#ff6b6f'};
+  cs.forEach(c=>{
+    const a=c.p[0], b=c.p[1];
+    if(Math.hypot(b[0]-a[0],b[1]-a[1])<1e-9) return;
+    vx.strokeStyle=colOf[c.role]||'#888'; vx.lineWidth=(c.role==='armature'||c.role==='breech')?6:4;
+    vx.lineCap='round';
+    vx.beginPath(); vx.moveTo(TX(a[0]),TY(a[1])); vx.lineTo(TX(b[0]),TY(b[1])); vx.stroke();
+    // current-sense chevrons
+    vx.fillStyle='#7fe3a0';
+    const n=Math.max(2,Math.round(Math.hypot(b[0]-a[0],b[1]-a[1])/ (Math.max(xa,gap)*0.13)));
+    for(let i=1;i<=n;i++){
+      const t=i/(n+1), px=a[0]+(b[0]-a[0])*t, py=a[1]+(b[1]-a[1])*t;
+      const ang=Math.atan2(-(b[1]-a[1])*s,(b[0]-a[0])*s);
+      vx.save(); vx.translate(TX(px),TY(py)); vx.rotate(ang);
+      vx.beginPath(); vx.moveTo(4,0); vx.lineTo(-3,3); vx.lineTo(-3,-3); vx.closePath(); vx.fill();
+      vx.restore();
+    }
+  });
+
+  // labels
+  vx.fillStyle='#ffb000'; vx.font='600 11px "Chakra Petch"';
+  vx.fillText('ARMATURE', TX(xa)+9, TY(gap*0.5)-6);
+  vx.fillStyle='#ff6b6f';
+  vx.fillText('BREECH', TX(0)-2, TY(hoff+gap*0.5)-8);
+
+  // force vectors — ABSOLUTE scale (px ∝ √force) so arrows grow with current/geometry
+  // and the small axial forces stay readable next to the much larger rail blowout.
+  const sm=sol.sum;
+  const GAIN=0.060, Lmin=12, Lmax=145;
+  const len=m=>Math.max(Lmin, Math.min(Lmax, GAIN*Math.sqrt(m)));
+  function fv(r,col,w,tag){
+    const o=sm[r]; const m=Math.hypot(o.fx,o.fy); if(m<1e-9)return;
+    const L=len(m), ux=o.fx/m, uy=o.fy/m;
+    const x0=TX(o.x), y0=TY(o.y), x1=x0+ux*L, y1=y0-uy*L;
+    arrow(vx, x0,y0, x1,y1, col, w);
+    // magnitude label just past the tip, pushed out along the arrow direction
+    vx.font='600 10px "IBM Plex Mono"'; vx.fillStyle=col;
+    vx.textAlign = ux>0.3?'left' : ux<-0.3?'right' : 'center';
+    vx.textBaseline = uy>0.3?'bottom' : uy<-0.3?'top' : 'middle';
+    vx.fillText(tag+fN(m), x1+ux*9, y1-uy*9);
+    vx.textAlign='left'; vx.textBaseline='alphabetic';
+  }
+  fv('railT','#34d0e6',2.5,'');     // draw blowout first (longest) so labels layer cleanly
+  fv('railB','#34d0e6',2.5,'');
+  fv('armature','#ffb000',3.5,'F→ ');
+  fv('breech','#ff4d52',3.5,'R← ');
+
+  // scale caption
+  vx.fillStyle='#4a5f5d'; vx.font='9px "IBM Plex Mono"'; vx.textAlign='left';
+  vx.fillText('arrows: length ∝ √force, responds to current', 10, H-9);
+}
+
+function drawMini(state){
+  const W=mini.width,H=mini.height,pad=22;
+  mx.clearRect(0,0,W,H);
+  // sweep torque vs offset
+  const {cs0, xa, gap, I} = state;
+  const N=21, Hmax=0.15, pts=[];
+  let tmax=1e-9;
+  for(let i=0;i<N;i++){
+    const h=-Hmax + 2*Hmax*i/(N-1);
+    const sol=solve(conductors(gap,xa,h), I);
+    const F = Math.abs(sol.sum.armature.fx);   // launch force magnitude
+    const tau = F*h;                            // couple = F * offset
+    pts.push([h,tau]); tmax=Math.max(tmax,Math.abs(tau));
+  }
+  const TX=x=>pad+(W-2*pad)*(x+Hmax)/(2*Hmax);
+  const TY=y=>H/2 - (H/2-pad)*(y/tmax);
+  // axes
+  mx.strokeStyle='#223133'; mx.lineWidth=1;
+  mx.beginPath(); mx.moveTo(pad,H/2); mx.lineTo(W-pad,H/2); mx.stroke();
+  mx.beginPath(); mx.moveTo(TX(0),pad); mx.lineTo(TX(0),H-pad); mx.stroke();
+  mx.fillStyle='#4a5f5d'; mx.font='9px "IBM Plex Mono"';
+  mx.fillText('+offset',W-pad-42,H/2+12); mx.fillText('−',pad,H/2+12);
+  mx.fillText('τ',TX(0)+4,pad+4);
+  // curve
+  mx.strokeStyle='#ffd24d'; mx.lineWidth=2; mx.beginPath();
+  pts.forEach((p,i)=>{ const X=TX(p[0]),Y=TY(p[1]); i?mx.lineTo(X,Y):mx.moveTo(X,Y);});
+  mx.stroke();
+  // current operating point
+  const h=state.hoff, F=Math.abs(state.sol.sum.armature.fx), tau=F*h;
+  mx.fillStyle='#ff4d52';
+  mx.beginPath(); mx.arc(TX(h),TY(tau),4,0,7); mx.fill();
+}
+
+// ---- wire up ----
+const el=id=>document.getElementById(id);
+function update(){
+  const I  = (+el('I').value)*1e3;        // A
+  const gap= (+el('G').value)/1000;       // m
+  const xa = +el('X').value;              // m
+  const hoff=(+el('H').value)/1000;       // m
+  el('vI').textContent=el('I').value;
+  el('vG').textContent=el('G').value;
+  el('vX').textContent=(+el('X').value).toFixed(2);
+  el('vH').textContent=el('H').value;
+
+  const cs  = conductors(gap,xa,hoff);
+  const sol = solve(cs, I);
+  const sm  = sol.sum;
+
+  const Ffwd = sm.armature.fx;                       // +x forward
+  const Frec = sm.breech.fx + sm.leadT.fx + sm.leadB.fx; // breech assembly axial (−x)
+  const Fblow= Math.hypot(sm.railT.fx, sm.railT.fy);
+  const net  = Math.hypot(sol.netx, sol.nety);
+  const Flaunch=Math.abs(Ffwd);
+  const tau  = Flaunch*hoff;                          // turning couple = F * offset
+
+  // closed-form cross-check  F = 1/2 L' I^2 , L' ~ (mu0/pi) ln(gap/r_wire)
+  const r_wire=gap*0.15, Lp=(4e-7*Math.PI/Math.PI)*Math.log(gap/r_wire); // mu0/pi*ln(...)
+  const Fcf=0.5*Lp*I*I;
+
+  el('oFwd').textContent = fN(Ffwd)+'  (→ muzzle)';
+  el('oRec').textContent = fN(Math.abs(Frec))+'  (← back)';
+  el('oBlow').textContent= fN(Fblow)+'  (⇅ apart)';
+  el('oNet').textContent = fN(net)+'  ≈ 0 ✓';
+  el('oCF').textContent  = fN(Fcf);
+  el('oTau').textContent = fNm(Math.abs(tau));
+  el('oDir').textContent = Math.abs(hoff)<1e-9 ? '— none —'
+                          : (hoff>0?'nose-down / CW':'nose-up / CCW');
+
+  const pill=el('pill'), vtxt=el('vTxt');
+  if(Math.abs(hoff)<1e-9){
+    pill.className='pill no'; pill.textContent='NO TORQUE';
+    vtxt.innerHTML='With the breech on the bore axis, the launch force and the recoil force are <b>collinear</b> → they cancel as a straight-back kick with <b>no net couple</b>. The gun slides back without yawing.';
+  } else {
+    pill.className='pill yes'; pill.textContent='TORQUE: '+fNm(Math.abs(tau));
+    vtxt.innerHTML='The breech is offset by <b>'+el('H').value+' mm</b>, so the backward recoil and the forward launch force are <b>not collinear</b> — they form a couple of <b>τ = F·d = '+fNm(Math.abs(tau))+'</b>. The structure gets a turning moment and will <b>yaw</b> as it recoils.';
+  }
+
+  const state={cs,sol,xa,gap,hoff,I,cs0:cs};
+  draw(state);
+  drawMini(state);
+}
+['I','G','X','H'].forEach(id=>el(id).addEventListener('input',update));
+update();
+window.addEventListener('resize',update);
+</script>
+</body>
+</html>
