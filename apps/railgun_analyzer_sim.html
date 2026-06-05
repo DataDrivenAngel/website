@@ -41,6 +41,18 @@
     repeating-linear-gradient(0deg,transparent 0 23px,var(--grid) 23px 24px),
     repeating-linear-gradient(90deg,transparent 0 23px,var(--grid) 23px 24px),
     #060a0b;}
+  .planhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;}
+  .planhead h2{margin:0;}
+  .sizectl{display:flex;gap:4px;flex:0 0 auto;}
+  .szbtn{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:12px;
+    width:30px;height:26px;line-height:1;border-radius:6px;cursor:pointer;
+    background:#0b1314;color:var(--dim);border:1px solid var(--line);transition:.15s;}
+  .szbtn:hover{color:var(--ink);border-color:#2c4143;}
+  .szbtn.active{background:#1c1405;color:var(--fwd);border-color:#4a3700;}
+  #expandBtn{font-size:15px;color:var(--fwd);}
+  .card#planCard.expanded{position:fixed;inset:10px;z-index:200;margin:0;overflow:auto;
+    box-shadow:0 0 0 100vmax rgba(2,5,6,.78), 0 20px 60px #000c;}
+  body.modal-open{overflow:hidden;}
   .ctrl{margin:13px 0;}
   .ctrl label{display:flex;justify-content:space-between;font-size:12.5px;
               margin-bottom:6px;align-items:baseline;}
@@ -85,14 +97,23 @@
   <div class="grid">
     <!-- LEFT: viewport + controls -->
     <div class="col">
-      <div class="card">
-        <h2>Plan view — current loop &amp; force vectors</h2>
-        <canvas id="view" width="720" height="430"></canvas>
+      <div class="card" id="planCard">
+        <div class="planhead">
+          <h2>Plan view — current loop &amp; force vectors</h2>
+          <div class="sizectl">
+            <button class="szbtn" data-h="0.50">S</button>
+            <button class="szbtn active" data-h="0.62">M</button>
+            <button class="szbtn" data-h="0.85">L</button>
+            <button class="szbtn" id="expandBtn" title="Expand to full screen">⤢</button>
+          </div>
+        </div>
+        <canvas id="view" width="720" height="446"></canvas>
         <div class="legend">
           <span class="tag" style="background:var(--cur)"></span>current path &nbsp;
           <span class="tag" style="background:var(--fwd)"></span>launch (fwd) &nbsp;
           <span class="tag" style="background:var(--rec)"></span>recoil (back) &nbsp;
-          <span class="tag" style="background:var(--blow)"></span>rail blowout
+          <span class="tag" style="background:var(--blow)"></span>rail blowout &nbsp;
+          <span class="tag" style="background:#d36bff"></span>cable load (flexible)
         </div>
       </div>
 
@@ -111,8 +132,12 @@
           <input id="X" type="range" min="0.1" max="2.0" step="0.01" value="0.80">
         </div>
         <div class="ctrl">
-          <label>Breech offset from bore axis <span class="val"><span id="vH">0</span> mm</span></label>
+          <label>Junction offset (vertical) <span class="val"><span id="vH">0</span> mm</span></label>
           <input id="H" type="range" min="-150" max="150" step="1" value="0">
+        </div>
+        <div class="ctrl">
+          <label>Cable setback (rearward) <span class="val"><span id="vS">0</span> mm</span></label>
+          <input id="S" type="range" min="0" max="600" step="2" value="0">
         </div>
       </div>
     </div>
@@ -125,8 +150,11 @@
           <div class="k"><span class="tag" style="background:var(--fwd)"></span>Launch force on armature →</div>
           <div class="v" id="oFwd" style="color:var(--fwd)">—</div>
 
-          <div class="k"><span class="tag" style="background:var(--rec)"></span>Recoil force at breech ←</div>
+          <div class="k"><span class="tag" style="background:var(--rec)"></span>Recoil (junction + cables) ←</div>
           <div class="v" id="oRec" style="color:var(--rec)">—</div>
+
+          <div class="k"><span class="tag" style="background:#d36bff"></span>Cable load (each, peak)</div>
+          <div class="v" id="oCab" style="color:#d36bff">—</div>
 
           <div class="k"><span class="tag" style="background:var(--blow)"></span>Blowout per rail ⇅</div>
           <div class="v" id="oBlow" style="color:var(--blow)">—</div>
@@ -135,48 +163,50 @@
 
           <div class="k">Net force on whole loop</div>
           <div class="v" id="oNet">—</div>
-          <div class="k">Closed-form check ½·L′·I²</div>
+          <div class="k">Launch vs. setback</div>
           <div class="v" id="oCF">—</div>
 
           <div class="sep"></div>
 
-          <div class="k"><b>Turning moment (couple)</b></div>
+          <div class="k"><b>Turning moment on barrel</b></div>
           <div class="v" id="oTau" style="color:var(--hot)">—</div>
           <div class="k">Rotation sense</div>
           <div class="v" id="oDir">—</div>
         </div>
         <div class="miniwrap">
           <canvas id="mini" width="430" height="150"></canvas>
-          <div class="legend">torque vs. breech offset — linear through the origin. Flat zero line = no offset, no twist.</div>
+          <div class="legend">turning moment vs. junction offset — linear through origin. Setback changes cable loads, not this couple.</div>
         </div>
       </div>
 
       <div class="card verdict">
         <h2>The verdict <span id="pill" class="pill no">NO TORQUE</span></h2>
-        <p><b>Recoil is felt at the breech, not the barrel.</b> The breech crossbar carries current <i>antiparallel</i> to the armature, so the two repel: the armature is shoved toward the muzzle and the breech is shoved backward by an equal force. The rails themselves only feel sideways "blowout" — they contribute essentially nothing to the axial recoil.</p>
-        <p id="vTxt">With the breech on the bore axis, the launch force and the recoil force are collinear → they cancel as a straight-back kick with <b>no net couple</b>. The gun slides back without yawing.</p>
-        <p class="note">Honest fine print for the pedants: the EM forces are internal, so the closed circuit can't spin <i>itself</i> up — net force and net torque over the entire loop are ≈0 (see "Net force" above). The twist appears the instant the projectile separates: the structure is left with a backward push applied at the offset breech, off the bore line → a couple τ = F·d. How fast it actually rotates depends on the gun's moment of inertia and where it's mounted; the <i>turning moment itself</i> is unambiguous. Same effect as a cannon whose recoil rod sits off the bore axis → muzzle climb.</p>
+        <p><b>Recoil is felt at the breech / junction, not the muzzle.</b> Whatever crossbar closes the circuit carries current <i>antiparallel</i> to the armature, so the two repel: armature shoved toward the muzzle, the closure shoved backward by an equal force. The rails only feel sideways "blowout."</p>
+        <p id="vTxt">With the junction on the bore axis, launch and recoil are collinear → straight-back kick, <b>no couple</b>.</p>
+        <p class="note" id="vCable">Flexible-cable note: routing the return out to an offset junction does <b>not</b> change the launch force (it's set by the rails at the armature) and the system still recoils with equal-and-opposite momentum. What changes is <i>where</i> the reaction lands and <i>how</i> it reaches the barrel. The big backward reaction now sits on the junction and the cables; because the cables are flexible they transmit only tension along their length (and no bending moment), so the barrel feels recoil as a rearward tug at the cable lugs. Vertical offset makes the two cable tensions asymmetric → a genuine twist on the barrel. Pure setback (no offset) just enlarges the loop and dumps enormous Lorentz load into the cables — opposite-current cables repel, so long ones whip and try to fly apart.</p>
       </div>
     </div>
   </div>
-  <p class="foot">Method: each conductor discretised into filament elements; B from every <i>other</i> element via Biot–Savart (μ₀/4π=1e-7), F = I·dL×B. Forces scale as I². Idealised thin filaments — directions &amp; ratios are exact, absolute magnitudes are order-of-magnitude.</p>
+  <p class="foot">Method: each conductor discretised into filament elements; B from every <i>other</i> element via Biot–Savart (μ₀/4π=1e-7) with finite-radius softening, F = I·dL×B. Forces scale as I². Directions &amp; ratios are robust; absolute magnitudes are order-of-magnitude. Cables drawn dashed = flexible.</p>
 </div>
 
 <script>
 const MU = 1e-7;            // mu0 / 4pi
-const M  = 44;             // filament elements per conductor
+const M  = 48;             // filament elements per conductor
 
 // Build the directed current loop. Current flows pts in listed order.
-// Geometry in metres. hoff = vertical offset of the breech bar from bore axis.
-function conductors(gap, xa, hoff){
+// Geometry in metres. hoff = vertical offset of the junction; S = rearward setback.
+// The return path runs from the rail ends out through two cables to a junction
+// crossbar parked at (-S, hoff). S=0 & hoff=0 -> classic breech bar at the rails.
+function conductors(gap, xa, hoff, S){
   const hg = gap/2;
   return [
-    {role:'leadB',    p:[[0,-hg],[0,hoff-hg]]},     // bottom lead up to breech bar
-    {role:'breech',   p:[[0,hoff-hg],[0,hoff+hg]]}, // breech crossbar (+y)
-    {role:'leadT',    p:[[0,hoff+hg],[0,hg]]},      // top lead back to rail
-    {role:'railT',    p:[[0,hg],[xa,hg]]},          // top rail (+x)
-    {role:'armature', p:[[xa,hg],[xa,-hg]]},        // armature (-y)
-    {role:'railB',    p:[[xa,-hg],[0,-hg]]}         // bottom rail (-x)
+    {role:'cableB',   p:[[0,-hg],[-S,hoff-hg]]},      // bottom rail end -> junction (return cable)
+    {role:'breech',   p:[[-S,hoff-hg],[-S,hoff+hg]]}, // junction crossbar (+y) = effective breech
+    {role:'cableA',   p:[[-S,hoff+hg],[0,hg]]},       // junction -> top rail end (feed cable)
+    {role:'railT',    p:[[0,hg],[xa,hg]]},            // top rail (+x)
+    {role:'armature', p:[[xa,hg],[xa,-hg]]},          // armature (-y)
+    {role:'railB',    p:[[xa,-hg],[0,-hg]]}           // bottom rail (-x)
   ];
 }
 
@@ -196,16 +226,19 @@ function discretise(cs){
 }
 
 // Solve forces (Newtons) on each element given current I (Amps).
-function solve(cs, I){
+// soft2 = squared softening length (finite wire radius) — kills the singular spike
+// where diagonal cables meet the rails at a shared vertex.
+function solve(cs, I, soft2){
   const e = discretise(cs);
   const F = e.map(()=>({fx:0,fy:0}));
+  const a2 = soft2 || 0;
   for(let i=0;i<e.length;i++){
     const ti=e[i]; let Bz=0;
     for(let j=0;j<e.length;j++){
       const s=e[j];
       if(s.ci===ti.ci) continue;              // skip same conductor (straight self-force = 0)
       const Rx=ti.x-s.x, Ry=ti.y-s.y;
-      const r2=Rx*Rx+Ry*Ry; if(r2<1e-10) continue;
+      const r2=Rx*Rx+Ry*Ry+a2; if(r2<1e-12) continue;
       const r=Math.sqrt(r2), r3=r2*r;
       // dBz = (mu0/4pi) I (dl x R)_z / r^3 ;  (dl x R)_z = lx*Ry - ly*Rx
       Bz += MU*I*(s.lx*Ry - s.ly*Rx)/r3;
@@ -257,11 +290,14 @@ function arrow(c,x0,y0,x1,y1,col,w){
 }
 
 function draw(state){
-  const {cs, sol, xa, gap, hoff} = state;
-  const W=view.width, H=view.height, pad=54;
-  // world bounds
+  const {cs, sol, xa, gap, hoff, S} = state;
+  const W=view.width, H=view.height;
+  const k=W/720;                       // scale factor: keeps fonts/lines proportional at any size
+  const F=(px)=>(px*k).toFixed(1);     // font px helper
+  const pad=54*k;
+  // world bounds (now include the rearward junction at x = -S)
   const yspan = Math.max(gap*0.5 + Math.abs(hoff), gap)+gap*0.6;
-  const xmin=-0.08*xa-0.02, xmax=xa+0.12*xa;
+  const xmin=Math.min(-S,0)-0.05*xa-0.03, xmax=xa+0.12*xa;
   const ymin=-yspan, ymax=yspan;
   const sx=(W-2*pad)/(xmax-xmin), sy=(H-2*pad)/(ymax-ymin);
   const s=Math.min(sx,sy);
@@ -270,93 +306,98 @@ function draw(state){
 
   vx.clearRect(0,0,W,H);
   // bore axis
-  vx.strokeStyle='#2a3d3f'; vx.setLineDash([6,6]); vx.lineWidth=1;
+  vx.strokeStyle='#2a3d3f'; vx.setLineDash([6*k,6*k]); vx.lineWidth=1*k;
   vx.beginPath(); vx.moveTo(TX(xmin),TY(0)); vx.lineTo(TX(xmax),TY(0)); vx.stroke();
   vx.setLineDash([]);
-  vx.fillStyle='#39504f'; vx.font='10px "IBM Plex Mono"';
-  vx.fillText('bore axis', TX(xa*0.62), TY(0)-5);
+  vx.fillStyle='#39504f'; vx.font=F(10)+'px "IBM Plex Mono"';
+  vx.fillText('bore axis', TX(xa*0.55), TY(0)-5*k);
 
-  // conductors
-  const colOf={railT:'#caa24a',railB:'#caa24a',armature:'#ffb000',breech:'#ff6b6f',leadT:'#ff6b6f',leadB:'#ff6b6f'};
+  // conductors: rails = brass, armature = amber, cables = magenta dashed (flexible), junction = red
+  const colOf={railT:'#caa24a',railB:'#caa24a',armature:'#ffb000',breech:'#ff4d52',cableA:'#d36bff',cableB:'#d36bff'};
   cs.forEach(c=>{
     const a=c.p[0], b=c.p[1];
     if(Math.hypot(b[0]-a[0],b[1]-a[1])<1e-9) return;
-    vx.strokeStyle=colOf[c.role]||'#888'; vx.lineWidth=(c.role==='armature'||c.role==='breech')?6:4;
+    const isCable=(c.role==='cableA'||c.role==='cableB');
+    vx.strokeStyle=colOf[c.role]||'#888';
+    vx.lineWidth=((c.role==='armature'||c.role==='breech')?6:(isCable?3:4))*k;
     vx.lineCap='round';
+    vx.setLineDash(isCable?[7*k,5*k]:[]);          // dashed = flexible cable
     vx.beginPath(); vx.moveTo(TX(a[0]),TY(a[1])); vx.lineTo(TX(b[0]),TY(b[1])); vx.stroke();
+    vx.setLineDash([]);
     // current-sense chevrons
     vx.fillStyle='#7fe3a0';
     const n=Math.max(2,Math.round(Math.hypot(b[0]-a[0],b[1]-a[1])/ (Math.max(xa,gap)*0.13)));
     for(let i=1;i<=n;i++){
       const t=i/(n+1), px=a[0]+(b[0]-a[0])*t, py=a[1]+(b[1]-a[1])*t;
       const ang=Math.atan2(-(b[1]-a[1])*s,(b[0]-a[0])*s);
-      vx.save(); vx.translate(TX(px),TY(py)); vx.rotate(ang);
+      vx.save(); vx.translate(TX(px),TY(py)); vx.rotate(ang); vx.scale(k,k);
       vx.beginPath(); vx.moveTo(4,0); vx.lineTo(-3,3); vx.lineTo(-3,-3); vx.closePath(); vx.fill();
       vx.restore();
     }
   });
 
   // labels
-  vx.fillStyle='#ffb000'; vx.font='600 11px "Chakra Petch"';
-  vx.fillText('ARMATURE', TX(xa)+9, TY(gap*0.5)-6);
-  vx.fillStyle='#ff6b6f';
-  vx.fillText('BREECH', TX(0)-2, TY(hoff+gap*0.5)-8);
+  vx.textAlign='left';
+  vx.fillStyle='#ffb000'; vx.font='600 '+F(11)+'px "Chakra Petch"';
+  vx.fillText('ARMATURE', TX(xa)+9*k, TY(gap*0.5)-6*k);
+  vx.fillStyle='#ff4d52';
+  vx.fillText(S>0.001?'JUNCTION':'BREECH', TX(-S)-2*k, TY(hoff+gap*0.5)-8*k);
+  if(S>0.001){ vx.fillStyle='#d36bff';
+    vx.fillText('flexible cables', TX(-S*0.5)-26*k, TY(hoff*0.5)-(hoff>=0?10*k:-16*k)); }
 
   // force vectors — ABSOLUTE scale (px ∝ √force) so arrows grow with current/geometry
   // and the small axial forces stay readable next to the much larger rail blowout.
   const sm=sol.sum;
-  const GAIN=0.060, Lmin=12, Lmax=145;
+  const GAIN=0.060*k, Lmin=12*k, Lmax=145*k;
   const len=m=>Math.max(Lmin, Math.min(Lmax, GAIN*Math.sqrt(m)));
   function fv(r,col,w,tag){
     const o=sm[r]; const m=Math.hypot(o.fx,o.fy); if(m<1e-9)return;
     const L=len(m), ux=o.fx/m, uy=o.fy/m;
     const x0=TX(o.x), y0=TY(o.y), x1=x0+ux*L, y1=y0-uy*L;
-    arrow(vx, x0,y0, x1,y1, col, w);
+    arrow(vx, x0,y0, x1,y1, col, w*k);
     // magnitude label just past the tip, pushed out along the arrow direction
-    vx.font='600 10px "IBM Plex Mono"'; vx.fillStyle=col;
+    vx.font='600 '+F(10)+'px "IBM Plex Mono"'; vx.fillStyle=col;
     vx.textAlign = ux>0.3?'left' : ux<-0.3?'right' : 'center';
     vx.textBaseline = uy>0.3?'bottom' : uy<-0.3?'top' : 'middle';
-    vx.fillText(tag+fN(m), x1+ux*9, y1-uy*9);
+    vx.fillText(tag+fN(m), x1+ux*9*k, y1-uy*9*k);
     vx.textAlign='left'; vx.textBaseline='alphabetic';
   }
   fv('railT','#34d0e6',2.5,'');     // draw blowout first (longest) so labels layer cleanly
   fv('railB','#34d0e6',2.5,'');
+  fv('cableA','#d36bff',2.8,'');     // cable Lorentz loads (whip/repel)
+  fv('cableB','#d36bff',2.8,'');
   fv('armature','#ffb000',3.5,'F→ ');
   fv('breech','#ff4d52',3.5,'R← ');
 
   // scale caption
-  vx.fillStyle='#4a5f5d'; vx.font='9px "IBM Plex Mono"'; vx.textAlign='left';
-  vx.fillText('arrows: length ∝ √force, responds to current', 10, H-9);
+  vx.fillStyle='#4a5f5d'; vx.font=F(9)+'px "IBM Plex Mono"'; vx.textAlign='left';
+  vx.fillText('arrows: length ∝ √force, responds to current', 10*k, H-9*k);
 }
 
 function drawMini(state){
   const W=mini.width,H=mini.height,pad=22;
   mx.clearRect(0,0,W,H);
-  // sweep torque vs offset
-  const {cs0, xa, gap, I} = state;
+  const {xa, gap, I, S, soft2} = state;
   const N=21, Hmax=0.15, pts=[];
   let tmax=1e-9;
   for(let i=0;i<N;i++){
     const h=-Hmax + 2*Hmax*i/(N-1);
-    const sol=solve(conductors(gap,xa,h), I);
+    const sol=solve(conductors(gap,xa,h,S), I, soft2);
     const F = Math.abs(sol.sum.armature.fx);   // launch force magnitude
-    const tau = F*h;                            // couple = F * offset
+    const tau = F*h;                            // couple = F * vertical offset
     pts.push([h,tau]); tmax=Math.max(tmax,Math.abs(tau));
   }
   const TX=x=>pad+(W-2*pad)*(x+Hmax)/(2*Hmax);
   const TY=y=>H/2 - (H/2-pad)*(y/tmax);
-  // axes
   mx.strokeStyle='#223133'; mx.lineWidth=1;
   mx.beginPath(); mx.moveTo(pad,H/2); mx.lineTo(W-pad,H/2); mx.stroke();
   mx.beginPath(); mx.moveTo(TX(0),pad); mx.lineTo(TX(0),H-pad); mx.stroke();
-  mx.fillStyle='#4a5f5d'; mx.font='9px "IBM Plex Mono"';
+  mx.fillStyle='#4a5f5d'; mx.font='9px "IBM Plex Mono"'; mx.textAlign='left';
   mx.fillText('+offset',W-pad-42,H/2+12); mx.fillText('−',pad,H/2+12);
   mx.fillText('τ',TX(0)+4,pad+4);
-  // curve
   mx.strokeStyle='#ffd24d'; mx.lineWidth=2; mx.beginPath();
   pts.forEach((p,i)=>{ const X=TX(p[0]),Y=TY(p[1]); i?mx.lineTo(X,Y):mx.moveTo(X,Y);});
   mx.stroke();
-  // current operating point
   const h=state.hoff, F=Math.abs(state.sol.sum.armature.fx), tau=F*h;
   mx.fillStyle='#ff4d52';
   mx.beginPath(); mx.arc(TX(h),TY(tau),4,0,7); mx.fill();
@@ -369,49 +410,100 @@ function update(){
   const gap= (+el('G').value)/1000;       // m
   const xa = +el('X').value;              // m
   const hoff=(+el('H').value)/1000;       // m
+  const S  = (+el('S').value)/1000;       // m  (rearward setback)
   el('vI').textContent=el('I').value;
   el('vG').textContent=el('G').value;
   el('vX').textContent=(+el('X').value).toFixed(2);
   el('vH').textContent=el('H').value;
+  el('vS').textContent=el('S').value;
 
-  const cs  = conductors(gap,xa,hoff);
-  const sol = solve(cs, I);
+  const soft2 = Math.pow(0.18*gap, 2);    // finite wire radius
+  const cs  = conductors(gap,xa,hoff,S);
+  const sol = solve(cs, I, soft2);
   const sm  = sol.sum;
 
-  const Ffwd = sm.armature.fx;                       // +x forward
-  const Frec = sm.breech.fx + sm.leadT.fx + sm.leadB.fx; // breech assembly axial (−x)
-  const Fblow= Math.hypot(sm.railT.fx, sm.railT.fy);
-  const net  = Math.hypot(sol.netx, sol.nety);
+  const Ffwd  = sm.armature.fx;                              // +x forward
+  const Frec  = sm.breech.fx + sm.cableA.fx + sm.cableB.fx;  // total axial reaction (← back)
+  const Fcab  = Math.max(Math.hypot(sm.cableA.fx,sm.cableA.fy),
+                         Math.hypot(sm.cableB.fx,sm.cableB.fy));
+  const Fblow = Math.hypot(sm.railT.fx, sm.railT.fy);
+  const net   = Math.hypot(sol.netx, sol.nety);
   const Flaunch=Math.abs(Ffwd);
-  const tau  = Flaunch*hoff;                          // turning couple = F * offset
+  const tau   = Flaunch*hoff;                                // turning couple = F * vertical offset
 
-  // closed-form cross-check  F = 1/2 L' I^2 , L' ~ (mu0/pi) ln(gap/r_wire)
-  const r_wire=gap*0.15, Lp=(4e-7*Math.PI/Math.PI)*Math.log(gap/r_wire); // mu0/pi*ln(...)
-  const Fcf=0.5*Lp*I*I;
+  // launch is set by rail geometry, NOT the return routing — show it's flat vs setback
+  const solS0 = solve(conductors(gap,xa,hoff,0), I, soft2);
+  const drift = 100*Math.abs(sm.armature.fx - solS0.sum.armature.fx)/Math.abs(solS0.sum.armature.fx||1);
 
   el('oFwd').textContent = fN(Ffwd)+'  (→ muzzle)';
   el('oRec').textContent = fN(Math.abs(Frec))+'  (← back)';
+  el('oCab').textContent = fN(Fcab)+(S>0.05?'  ⚡ whip':'');
   el('oBlow').textContent= fN(Fblow)+'  (⇅ apart)';
-  el('oNet').textContent = fN(net)+'  ≈ 0 ✓';
-  el('oCF').textContent  = fN(Fcf);
+  const netOK = net < 0.03*Math.max(Flaunch,1);
+  el('oNet').textContent = fN(net)+(netOK?'  ≈ 0 ✓':'');
+  el('oCF').textContent  = 'Δ'+drift.toFixed(1)+'% (≈ flat)';
   el('oTau').textContent = fNm(Math.abs(tau));
   el('oDir').textContent = Math.abs(hoff)<1e-9 ? '— none —'
                           : (hoff>0?'nose-down / CW':'nose-up / CCW');
 
-  const pill=el('pill'), vtxt=el('vTxt');
+  const pill=el('pill'), vtxt=el('vTxt'), big=S>0.05;
   if(Math.abs(hoff)<1e-9){
-    pill.className='pill no'; pill.textContent='NO TORQUE';
-    vtxt.innerHTML='With the breech on the bore axis, the launch force and the recoil force are <b>collinear</b> → they cancel as a straight-back kick with <b>no net couple</b>. The gun slides back without yawing.';
+    pill.className='pill no'; pill.textContent= big?'NO TWIST · CABLES LOADED':'NO TORQUE';
+    vtxt.innerHTML='Junction on the bore axis: launch and recoil are <b>collinear</b> → straight-back kick, <b>no couple</b>.'
+      + (big? ' But each cable is carrying <b>'+fN(Fcab)+'</b> — flexible cables this loaded will whip and repel each other.' : '');
   } else {
-    pill.className='pill yes'; pill.textContent='TORQUE: '+fNm(Math.abs(tau));
-    vtxt.innerHTML='The breech is offset by <b>'+el('H').value+' mm</b>, so the backward recoil and the forward launch force are <b>not collinear</b> — they form a couple of <b>τ = F·d = '+fNm(Math.abs(tau))+'</b>. The structure gets a turning moment and will <b>yaw</b> as it recoils.';
+    pill.className='pill yes'; pill.textContent='TWIST: '+fNm(Math.abs(tau));
+    vtxt.innerHTML='Junction offset <b>'+el('H').value+' mm</b>: recoil and launch are <b>not collinear</b> → couple <b>τ = F·d = '+fNm(Math.abs(tau))+'</b>. With flexible cables this arrives as <b>asymmetric cable tension</b> tugging the barrel — it yaws'
+      + (big? ', while each cable carries <b>'+fN(Fcab)+'</b> and whips.' : '.');
   }
 
-  const state={cs,sol,xa,gap,hoff,I,cs0:cs};
+  const state={cs,sol,xa,gap,hoff,S,I,soft2};
+  fit();
   draw(state);
   drawMini(state);
 }
-['I','G','X','H'].forEach(id=>el(id).addEventListener('input',update));
+
+// ---- plan-view sizing ----
+const planCard=el('planCard');
+let aspect=0.62;                                   // canvas height / width (M default)
+function fit(){
+  const dpr=Math.min(window.devicePixelRatio||1, 2);
+  let cssW, cssH;
+  if(planCard.classList.contains('expanded')){
+    cssW=planCard.clientWidth-28;                  // minus card padding
+    cssH=Math.max(300, window.innerHeight-118);    // leave room for header + legend
+  } else {
+    cssW=view.clientWidth || 680;
+    cssH=Math.round(cssW*aspect);
+  }
+  view.style.height=cssH+'px';
+  view.width =Math.round(cssW*dpr);                // crisp internal buffer
+  view.height=Math.round(cssH*dpr);
+}
+
+// size presets S / M / L
+document.querySelectorAll('.szbtn[data-h]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.szbtn[data-h]').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    aspect=+b.dataset.h;
+    if(planCard.classList.contains('expanded')) toggleExpand();  // presets exit fullscreen
+    else update();
+  });
+});
+
+// fullscreen expand
+function toggleExpand(){
+  const on=planCard.classList.toggle('expanded');
+  document.body.classList.toggle('modal-open', on);
+  el('expandBtn').textContent = on ? '⤡' : '⤢';
+  el('expandBtn').title = on ? 'Collapse' : 'Expand to full screen';
+  update();
+}
+el('expandBtn').addEventListener('click',toggleExpand);
+window.addEventListener('keydown',e=>{ if(e.key==='Escape'&&planCard.classList.contains('expanded')) toggleExpand(); });
+
+['I','G','X','H','S'].forEach(id=>el(id).addEventListener('input',update));
 update();
 window.addEventListener('resize',update);
 </script>
