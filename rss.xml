@@ -7,8 +7,35 @@
     <link>https://www.williamangel.net/blog/</link>
     <description>Posts from williamangel.net</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 20 May 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 05 Jun 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://www.williamangel.net/rss.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>The Stochastically K-Shaped Engineering Job Market</title>
+      <link>https://www.williamangel.net/blog/2026/06/05/the-stochastically-k-shaped-engineering-job-market.html</link>
+      <guid isPermaLink="true">https://www.williamangel.net/blog/2026/06/05/the-stochastically-k-shaped-engineering-job-market.html</guid>
+      <pubDate>Fri, 05 Jun 2026 00:00:00 +0000</pubDate>
+      <description>The job market is simultaneously hot and impossible.</description>
+      <content:encoded><![CDATA[<h1>The Stochastically K-Shaped Job Market</h1>
+<h3>Published 2026-06-05</h3>
+<p><img src="2026-06-05-bls-employment-population-ratio.png" alt="BLS employment to population ratio"></p>
+<h1>The job market has gone K-Shaped in a weird way.</h1>
+<p>The job market seems to have gone stochastically K-Shaped. It is simultaneously hot and impossible, in that for some the odds of finding a job are very high, but for others it&#x27;s nearly impossible.</p>
+<p>This is only stochastically true, so your experience may very.</p>
+<h2>Anecdotes</h2>
+<p>I had someone in a group chat today say they&#x27;d take 5 months of severance if offered because the job market is hot enough. At a happy hour I met a new grad software engineer who told me that 1000 job applications hadn&#x27;t gotten them a single interview...</p>
+<h2>Data</h2>
+<p>The BLS has a lot of data which shows that things are not great, not terrible. The unemployment rate in May 2026 was 4.3%, down from 4.5% in November of last year.</p>
+<p>https://www.bls.gov/charts/employment-situation/persons-not-in-the-labor-force-selected-indicators.htm</p>
+<p>But the ratio of employment to people is decreasing:</p>
+<p><img src="2026-06-05-bls-employment-population-ratio.png" alt="BLS employment to population ratio"></p>
+<p>And the number of people not in the labor force is increasing:</p>
+<p><img src="2026-06-05-bls-people-not-in-the-labor.png" alt="BLS people not in the labor market"></p>
+<p>And the number of &#x27;long term unemployed&#x27; people who have been unemployed for more than 27 weeks was 27.5% of the overall unemployed population in May 2026, up from 19.2% in May 2023.</p>
+<p>https://www.bls.gov/charts/employment-situation/unemployed-27-weeks-or-longer-as-a-percent-of-total-unemployed.htm</p>
+<p>So 1.3 million more people are unemployed than 3 years ago. The number of people not in the labor force who would like a job is up 600,000 from May of 2024.</p>
+<h2>Conclusion</h2>
+<p>The job market is hot for some, impossible for others, and stochastically that makes me sad thinking about the people who got laid off 18 months ago and may never find a job again despite wanting one. Increase your luck by learning, practicing competence, and helping out your fellow humans, as networks are a significant factor in what makes a person hot outside or inside of a job. Plus, tautologically, the world is overall better when we&#x27;re good to each other.</p>]]></content:encoded>
+    </item>
     <item>
       <title>Claude.AI Pro Plan quotas too small for deep research</title>
       <link>https://www.williamangel.net/blog/2026/05/20/ClaudeAI-Pro-Plan-Gives-Single-Deep-Research.html</link>
