@@ -127,25 +127,27 @@ gtag('config', 'G-SPPPPB9KSW');
 <div class="container">
 <p class="post-tags" aria-label="Tags"><span>Tags: </span><a class="post-tag" href="/blog/?tag=ai">AI</a>, <a class="post-tag" href="/blog/?tag=coding">Coding</a>, <a class="post-tag" href="/blog/?tag=software-engineering">Software Engineering</a>, <a class="post-tag" href="/blog/?tag=technical-debt">Technical Debt</a>, <a class="post-tag" href="/blog/?tag=llms">LLMs</a></p><h1>The AI Tarpit: Why You Can&#x27;t Stop Reading Your Code</h1>
 <h3>Published 2026-06-22</h3>
+<hr>
 <p><img src="2026-06-22-gull-eating-a-chip.jpg" alt="Eating Delicious AI Slop"><br>
 <em>Figure 1: A vibecoder (pejorative) eating AI slop. Photo credit yours truly. </em></p>
-<p>I read Abigail Haddad’s recent <a href="https://presentofcoding.substack.com/p/no-i-dont-read-my-code">piece about &quot;not reading code</a> and I violently agree. You still need to read your code!  (mostly)</p>
-<p>Granted, when you’re in an exploratory phase and are building a quick prototype, a data visualization, or an interactive wireframe to see if an idea might work, the &quot;vibe coding&quot; approach is very powerful. As Abigail points points out, your attention is one of your most expensive resources, so why waste it on the <em>how</em> when you could be focusing on the <em>what</em>?</p>
+<p>I read Abigail Haddad’s recent <a href="https://presentofcoding.substack.com/p/no-i-dont-read-my-code">piece about not reading code</a> and I violently agree. You still need to read your code!  (mostly)</p>
+<p>Granted, when you’re in an exploratory phase and are building a quick prototype, a data visualization, or an interactive wireframe to see if an idea might work, the &quot;vibe coding&quot; approach is very powerful. As Abigail&#x27;s post points out, your attention is one of your most expensive resources, so why waste it on the <em>how</em> when you could be focusing on the <em>what</em>?</p>
 <p>But, <strong>at what point does not reading the code turn into losing control of the code?</strong></p>
 <h2>The Hidden Cost of building black boxes</h2>
 <p>There is an area between being a syntax expert and not knowing how your code works and that is where the danger lies.</p>
 <p>When we stop reading the code, we begin to miss opportunities to find better methods, like the moments where you’re glancing at a script Claude is writing and realize, <em>&quot;Wait, if I just nudged it here, we could turn this local tool into a standalone web app that runs in the browser and simplify, and also WASM is cool so it doesn&#x27;t count as excessive complexity!.&quot;</em></p>
 <p>If you only look at the inputs and outputs, you will miss the structural opportunities that a quick glance at the implementation would reveal. You might get a tool that works, but you miss the chance to see how to build a better tool. Elegance isn&#x27;t something we as an industry actually value over working code unfortunately, and fortunately computers are fast so janky tools can still be quite good.</p>
 <h2>Superfund Legacy Codebases</h2>
-<p>The bigger risk though isn&#x27;t missing out on design improvements, or clean code, or avoiding clean code (pejorative), it’s about the long-term architecture of our systems and speedrunning our way into a tar pit.</p>
+<p>The bigger risk though isn&#x27;t missing out on design improvements, or writing clean code, or avoiding clean code (pejorative), it’s about the long-term architecture of our systems and speedrunning our way into a tar pit.</p>
 <p>You&#x27;ve probably experienced legacy codebases. They grow, they get complicated, and eventually, they become so tangled that even the original developers are afraid to touch them. Making a simple change becomes an expensive, high-risk operation.</p>
 <p>With AI, we now have a new, much faster way to accumulate technical debt. We can create a Superfund Legacy Codebase at record speed.</p>
 <p>If you don&#x27;t read the code, you aren&#x27;t making design choices and are delegating them to the AI. If we don&#x27;t read the code, we are essentially letting the AI architect a system that we don&#x27;t actually understand. Systems tend to accrete complexity, and generative AI are better at generating than subtracting.</p>
 <p>Eventually a growing system hits a complexity ceiling, the point where the AI can no longer reliably make changes without breaking everything. Humans and their code has this same ceiling, but with skilled people you can maintain more complexity. AI is faster, until it&#x27;s not.</p>
 <h2>Avoiding the Tarpit</h2>
-<p>I worry that vibe coding without oversight is a one-way ticket into a technical tarpit. The less of our code we read, the less of our system we understand. The more we use AI to accelerate, the faster we might be accelerating into a level of complexity that even the best LLM can&#x27;t help us untangle.</p>
+<p>Vibe coding without oversight is a one-way ticket into a technical tarpit. The less of our code we read, the less of our system we understand. The more we use AI to accelerate, the faster we might be accelerating into a level of complexity that even the best LLM can&#x27;t help us untangle.</p>
 <p>Abigail is right that we shouldn&#x27;t spend our attention on implementation details in all contexts,  but if we need to spend a good portion of our budget on <em>auditing</em> the implementation anyways it doesn&#x27;t save us that much.</p>
 <p>If we don&#x27;t understand the foundation of what we&#x27;re building, we might eventually find ourselves standing in the middle of a very impressive, very functional, but ultimately unchangeable mess. Superfund sites can cost billions to clean up and hurt a lot of people along the way, so consider how much time and money you can save by reading your code, especially in contexts that matter.</p>
+<hr>
 <p><img src="2026-06-22-refactoring.png" alt="Refactoring Meme Tweet"><br>
 <em>None of it worked, but boy was it beautiful</em></p>
 </div>
