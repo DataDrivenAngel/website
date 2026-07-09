@@ -24,46 +24,36 @@
 <p><img src="2026-06-25-exactly.png" alt="Exactly and precisely..."></p>
 <p>&quot;dokładnie i zwięźle.&quot;</p>
 <p><strong>&quot;dokładnie i zwięźle.&quot;</strong></p>
-<p>I asked &quot;Why did you say &quot;dokładnie i zwięźle.&quot;&quot;? and Gemma had a very interesting chain of thought that included an explanation for what it meant:</p>
-<p>&gt; &quot;However, the user&#x27;s prompt just before my last response was &quot;dokładnie i zwięźle.&quot; (which means &quot;exactly and concisely&quot; in Polish).&quot; -Gemma4:31b</p>
-<p>and the chain of reasoning contained an extremely interesting ending:</p>
+<p>I asked &quot;Why did you say &quot;dokładnie i zwięźle.&quot;?&quot; and Gemma had a very interesting chain of thought that included an explanation for what it meant:</p>
+<p>&gt; &quot;However, the user&#x27;s prompt just before my last response was &quot;dokładnie i zwięźle.&quot; (which means &quot;exactly and concisely&quot; in Polish).&quot; - Gemma4:31b</p>
+<p>And the chain of reasoning contained an extremely interesting ending:</p>
 <p>&gt; <em>Wait, looking at the very end of the previous turn&#x27;s response from me:</em><br>
-&gt;<br>
-&gt; 	<em>I ended with ==&quot;I will now write the plan to a markdown file.&quot;</em>==<br>
-&gt;<br>
-&gt; 	<em>Then the user said: &quot;dokładnie i zwięźle.&quot;</em><br>
-&gt;<br>
-&gt; 	<em>Then the user asks: &quot;Why did you say &#x27;dokładnie i zwięźle.&#x27;&quot;</em><br>
-&gt;<br>
-&gt;<br>
+&gt; <em>I ended with &quot;I will now write the plan to a markdown file.&quot;</em><br>
+&gt; <em>Then the user said: &quot;dokładnie i zwięźle.&quot;</em><br>
+&gt; <em>Then the user asks: &quot;Why did you say &#x27;dokładnie i zwięźle.&#x27;&quot;</em><br>
 &gt;<br>
 &gt; <em>It&#x27;s possible the user is mistaken, or they are seeing something I&#x27;m not.</em><br>
 &gt; <em>Or maybe I&#x27;m missing a turn.</em><br>
 &gt; <em>Regardless, I didn&#x27;t use those words.</em><br>
 &gt;<br>
-&gt;<br>
-&gt;<br>
 &gt; <em>Wait, the user&#x27;s prompt contains:</em><br>
 &gt;<br>
-&gt; 	<em><code>user: dokładnie i zwięźle.</code></em><br>
-&gt;<br>
-&gt; 	<em><code>assistant: [nothing]</code></em><br>
-&gt;<br>
-&gt; 	<em><code>user: Why did you say &amp;quot;dokładnie i zwięźle.&amp;quot;</code></em><br>
+&gt; <em><code>user: dokładnie i zwięźle.</code></em><br>
+&gt; <em><code>assistant: [nothing]</code></em><br>
+&gt; <em><code>user: Why did you say &amp;#x27;dokładnie i zwięźle.&amp;#x27;</code></em><br>
 &gt;<br>
 &gt; <em>I will just tell the user that I didn&#x27;t say that.</em><br>
 &gt;<br>
 &gt; <em>One more possibility: maybe the user is referring to a previous session or a different context.</em><br>
 &gt; <em>Or maybe they are just confused.</em><br>
 &gt;<br>
-&gt;<br>
 &gt; <em>I&#x27;ll keep it concise.</em></p>
-<p>&gt; ==I did not say that; you did.==</p>
+<p>&gt; I did not say that; you did.</p>
 <p>Probably an OpenCode harness bug, but I do think it&#x27;s funny that my first words in polish were &quot;exactly and concisely&quot;</p>
 <hr>
 <p>OpenCode version 1.14.28<br>
 Gemma4 :31B.</p>
-<p>Full Transcript:  <a href="website/media/opencode_session-ses_1002_concisely_polish.md">/media/opencode_session-ses_1002_concisely_polish.md</a></p>
+<p>Full Transcript:  <a href="website/media/opencode_session-ses_1002_concisely_polish.md">/opencode_session-ses_1002_concisely_polish.md</a></p>
 <p><img src="2026-06-25-exactly-full.png" alt="Exactly and precisely..."></p>]]></content:encoded>
     </item>
     <item>
