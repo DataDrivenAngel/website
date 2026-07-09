@@ -7,17 +7,17 @@
     <link>https://www.williamangel.net/blog/</link>
     <description>Posts from williamangel.net</description>
     <language>en-us</language>
-    <lastBuildDate>Thu, 25 Jun 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 08 Jul 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://www.williamangel.net/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>I did not say that, you did</title>
-      <link>https://www.williamangel.net/blog/2026/06/25/OpenCode-Bug-I-did-not-say-that-you-did.html</link>
-      <guid isPermaLink="true">https://www.williamangel.net/blog/2026/06/25/OpenCode-Bug-I-did-not-say-that-you-did.html</guid>
-      <pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate>
+      <link>https://www.williamangel.net/blog/2026/07/08/OpenCode-Bug-I-did-not-say-that-you-did.html</link>
+      <guid isPermaLink="true">https://www.williamangel.net/blog/2026/07/08/OpenCode-Bug-I-did-not-say-that-you-did.html</guid>
+      <pubDate>Wed, 08 Jul 2026 00:00:00 +0000</pubDate>
       <description>Gemma in Opencode said:</description>
       <content:encoded><![CDATA[<h1>Exactly and concisely: My first words in polish according to OpenCode</h1>
-<p>##</p>
-<h3>Published 2026-06-25</h3>
+<h3>Published 2026-07-08</h3>
+<h4>Written 2026-06-25 but I forgot to publish it</h4>
 <p>&gt; &quot;dokładnie i zwięźle.&quot;</p>
 <p>I&#x27;m on a plane agan and was using opencode to see if it could make a change.  Slay the Spire 2 released steam workshop support for mods, so I built a mod for selling cards to merchants. Someone gave feedback that the number of cards sellable in multiplayer was shared between players instead of <em>per player</em>. Easy fix right?</p>
 <p>I had Gemma4:31b make a markdown plan, and then it ended with:</p>
