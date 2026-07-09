@@ -21,7 +21,7 @@
 <p>&gt; &quot;dokładnie i zwięźle.&quot;</p>
 <p>I&#x27;m on a plane agan and was using opencode to see if it could make a change.  Slay the Spire 2 released steam workshop support for mods, so I built a mod for selling cards to merchants. Someone gave feedback that the number of cards sellable in multiplayer was shared between players instead of <em>per player</em>. Easy fix right?</p>
 <p>I had Gemma4:31b make a markdown plan, and then it ended with:</p>
-<p>![[2026-06-25-exactly.png]]</p>
+<p><img src="2026-06-25-exactly.png" alt="Exactly and precisely..."></p>
 <p>&quot;dokładnie i zwięźle.&quot;</p>
 <p><strong>&quot;dokładnie i zwięźle.&quot;</strong></p>
 <p>I asked &quot;Why did you say &quot;dokładnie i zwięźle.&quot;&quot;? and Gemma had a very interesting chain of thought that included an explanation for what it meant:</p>
@@ -64,7 +64,7 @@
 <p>OpenCode version 1.14.28<br>
 Gemma4 :31B.</p>
 <p>Full Transcript:  <a href="website/media/opencode_session-ses_1002_concisely_polish.md">/media/opencode_session-ses_1002_concisely_polish.md</a></p>
-<p>![[2026-06-25-exactly-full.png]]</p>]]></content:encoded>
+<p><img src="2026-06-25-exactly-full.png" alt="Exactly and precisely..."></p>]]></content:encoded>
     </item>
     <item>
       <title>The AI Tarpit: Why You Can't Stop Reading Your Code</title>
