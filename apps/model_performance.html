@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Performance Envelope</title>
+    <script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            padding: 1.5rem 1rem 0.5rem;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            background: linear-gradient(90deg, #00d2ff, #7b2ff7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            font-size: 0.9rem;
+            color: #999;
+            margin-top: 0.3rem;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            gap: 1rem;
+            padding: 1rem;
+            max-height: calc(100vh - 100px);
+        }
+
+        #plot-container {
+            flex: 1;
+            min-height: 500px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .controls {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1.2rem;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .control-section h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #7b2ff7;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid rgba(123, 47, 247, 0.2);
+        }
+
+        .slider-group {
+            margin-bottom: 1rem;
+        }
+
+        .slider-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            margin-bottom: 0.3rem;
+            color: #ccc;
+        }
+
+        .slider-group label span {
+            color: #00d2ff;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d2ff, #7b2ff7);
+            box-shadow: 0 2px 6px rgba(0, 210, 255, 0.3);
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d2ff, #7b2ff7);
+            box-shadow: 0 2px 6px rgba(0, 210, 255, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 0.85rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        select:focus {
+            border-color: rgba(0, 210, 255, 0.4);
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .toggle-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.78rem;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: rgba(123, 47, 247, 0.2);
+            border-color: #7b2ff7;
+            color: #fff;
+        }
+
+        .toggle-btn:hover {
+            border-color: rgba(0, 210, 255, 0.4);
+        }
+
+        .model-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .model-toggle input[type="checkbox"] {
+            accent-color: #7b2ff7;
+            cursor: pointer;
+        }
+
+        .model-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .model-toggle label {
+            cursor: pointer;
+            color: #ccc;
+        }
+
+        .axis-row {
+            margin-bottom: 0.6rem;
+        }
+
+        .axis-row label.axis-label {
+            font-size: 0.78rem;
+            color: #888;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .scale-toggle {
+            display: flex;
+            gap: 0.3rem;
+            margin-top: 0.35rem;
+        }
+
+        .scale-btn {
+            flex: 1;
+            padding: 0.25rem 0.4rem;
+            font-size: 0.7rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.03);
+            color: #888;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .scale-btn.active {
+            background: rgba(0, 210, 255, 0.14);
+            border-color: rgba(0, 210, 255, 0.5);
+            color: #00d2ff;
+        }
+
+        .scale-btn:hover {
+            color: #ddd;
+        }
+
+        .range-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 0.3rem;
+        }
+
+        .info-box {
+            background: rgba(0, 210, 255, 0.05);
+            border: 1px solid rgba(0, 210, 255, 0.15);
+            border-radius: 8px;
+            padding: 0.8rem;
+            font-size: 0.78rem;
+            line-height: 1.5;
+            color: #aab;
+        }
+
+        .info-box strong {
+            color: #00d2ff;
+        }
+
+        .info-box a {
+            color: #00d2ff;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+                max-height: none;
+            }
+            .controls {
+                width: 100%;
+            }
+            #plot-container {
+                min-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Model Performance Envelope</h1>
+        <p>The achievable frontier across cost, speed &amp; quality &mdash; real data from Artificial Analysis</p>
+    </header>
+
+    <div class="container">
+        <div id="plot-container"></div>
+
+        <div class="controls">
+            <div class="control-section">
+                <div class="info-box" style="border-color: rgba(123, 47, 247, 0.25); background: rgba(123, 47, 247, 0.05);">
+                    <strong>Source:</strong> <a href="https://artificialanalysis.ai/leaderboards/models" target="_blank" rel="noopener">artificialanalysis.ai/leaderboards/models</a>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>Envelope Axes</h3>
+                <div class="axis-row">
+                    <label class="axis-label">X Axis</label>
+                    <select id="axis-x">
+                        <option value="price" selected>Blended Price ($/M tokens)</option>
+                        <option value="speed">Output Speed (tokens/s)</option>
+                        <option value="latency">Latency First Chunk (s)</option>
+                        <option value="responseTime">Response Time (s)</option>
+                        <option value="quality">Quality Index</option>
+                    </select>
+                    <div class="scale-toggle" data-axis="x">
+                        <button class="scale-btn active" data-scale="linear">Linear</button>
+                        <button class="scale-btn" data-scale="log">Log</button>
+                    </div>
+                </div>
+                <div class="axis-row">
+                    <label class="axis-label">Y Axis</label>
+                    <select id="axis-y">
+                        <option value="price">Blended Price ($/M tokens)</option>
+                        <option value="speed" selected>Output Speed (tokens/s)</option>
+                        <option value="latency">Latency First Chunk (s)</option>
+                        <option value="responseTime">Response Time (s)</option>
+                        <option value="quality">Quality Index</option>
+                    </select>
+                    <div class="scale-toggle" data-axis="y">
+                        <button class="scale-btn active" data-scale="linear">Linear</button>
+                        <button class="scale-btn" data-scale="log">Log</button>
+                    </div>
+                </div>
+                <div class="axis-row">
+                    <label class="axis-label">Z Axis</label>
+                    <select id="axis-z">
+                        <option value="price">Blended Price ($/M tokens)</option>
+                        <option value="speed">Output Speed (tokens/s)</option>
+                        <option value="latency">Latency First Chunk (s)</option>
+                        <option value="responseTime">Response Time (s)</option>
+                        <option value="quality" selected>Quality Index</option>
+                    </select>
+                    <div class="scale-toggle" data-axis="z">
+                        <button class="scale-btn active" data-scale="linear">Linear</button>
+                        <button class="scale-btn" data-scale="log">Log</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>Min Quality Index</h3>
+                <input type="range" id="min-quality" min="0" max="55" value="0" step="1">
+                <div class="range-label">
+                    <span>0</span>
+                    <span id="min-quality-val">0</span>
+                    <span>55</span>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>Visualization</h3>
+                <div class="slider-group">
+                    <label style="margin-bottom: 0.5rem;">Surface Style</label>
+                    <select id="surface-style">
+                        <option value="smooth" selected>Smooth envelope</option>
+                        <option value="faceted">Faceted (polygons)</option>
+                    </select>
+                </div>
+                <div class="slider-group" id="smoothness-group">
+                    <label>Envelope Smoothness <span id="val-smoothness">0.32</span></label>
+                    <input type="range" id="smoothness" min="0" max="1" step="0.01" value="0.32">
+                    <div class="range-label">
+                        <span>tight to models</span>
+                        <span>broad curve</span>
+                    </div>
+                </div>
+                <div class="slider-group" id="tightness-group" style="display: none;">
+                    <label>Facet Tightness <span id="val-tightness">0.60</span></label>
+                    <input type="range" id="tightness" min="0" max="1" step="0.01" value="0.60">
+                    <div class="range-label">
+                        <span>convex hull</span>
+                        <span>hugs models</span>
+                    </div>
+                </div>
+                <div class="slider-group">
+                    <label>Envelope Opacity <span id="val-opacity">0.55</span></label>
+                    <input type="range" id="opacity" min="0.05" max="1" step="0.05" value="0.55">
+                </div>
+                <div class="slider-group">
+                    <label style="margin-bottom: 0.5rem;">Color Scale</label>
+                    <select id="colorscale">
+                        <option value="Viridis">Viridis</option>
+                        <option value="Plasma">Plasma</option>
+                        <option value="Inferno">Inferno</option>
+                        <option value="Turbo">Turbo</option>
+                        <option value="Electric">Electric</option>
+                        <option value="Portland">Portland</option>
+                    </select>
+                </div>
+                <div class="slider-group">
+                    <label style="margin-bottom: 0.5rem;">Camera</label>
+                    <div class="toggle-group">
+                        <button class="toggle-btn" id="spin-btn">Auto-Rotate</button>
+                        <button class="toggle-btn" id="reset-view">Reset View</button>
+                    </div>
+                </div>
+                <div class="slider-group" id="spin-speed-group" style="display: none;">
+                    <label>Rotation Speed <span id="val-spin">0.20</span></label>
+                    <input type="range" id="spin-speed" min="0.02" max="1" step="0.02" value="0.20">
+                    <div class="range-label">
+                        <span>slow</span>
+                        <span>fast</span>
+                    </div>
+                </div>
+                <div class="slider-group">
+                    <label style="margin-bottom: 0.5rem;">Show Elements</label>
+                    <div class="toggle-group">
+                        <button class="toggle-btn active" data-layer="points">All Models</button>
+                        <button class="toggle-btn active" data-layer="frontier">Frontier Models</button>
+                        <button class="toggle-btn active" data-layer="surface">Envelope Surface</button>
+                        <button class="toggle-btn active" data-layer="edges">Facet Edges</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>Creators</h3>
+                <div id="creator-toggles"></div>
+            </div>
+
+            <div class="control-section">
+                <div class="info-box">
+                    <strong>Performance Envelope:</strong> The set of Pareto-optimal models &mdash; those that no other model beats on every axis at once. Highlighted points form the achievable frontier, and the surface is a smooth ceiling fitted over them: everything else lives underneath. Moving along the sheet means trading one dimension (cost, speed, quality) to gain in another. <strong>Smoothness</strong> widens the fit &mdash; low values follow the individual models, high values show the broad shape of the tradeoff. Switch to <strong>Faceted</strong> to see the raw triangulation, whose vertices are the frontier models themselves. Any axis can be set to <strong>log</strong> &mdash; useful for price and speed, which span orders of magnitude. Note that a log axis has to drop models whose value there is $0.00.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const csvData = `Model,Creator,Context Window,Quality Index,Blended Price ($/M tokens),Median Output Speed (tokens/s),Latency First Chunk (s),Total Response Time (s)
+"GPT-5.5 (xhigh)",OpenAI,922k,60,4.35,71,74.51,81.56
+"GPT-5.5 (high)",OpenAI,922k,59,4.35,75,21.24,27.86
+"Claude Opus 4.7 (max)",Anthropic,1M,57,4.10,51,12.15,21.99
+"Gemini 3.1 Pro Preview",Google,1M,57,1.74,136,28.43,32.11
+"GPT-5.5 (medium)",OpenAI,922k,57,4.35,75,4.48,11.16
+"Qwen3.7 Max",Alibaba,1M,57,1.43,205,2.53,16.75
+"Gemini 3.5 Flash",Google,1M,55,1.31,203,18.99,21.45
+"Kimi K2.6",Kimi,256k,54,0.70,99,2.03,52.20
+"MiMo-V2.5-Pro",Xiaomi,1M,54,0.71,61,3.29,44.30
+"GPT-5.3 Codex (xhigh)",OpenAI,400k,54,1.87,85,69.03,74.88
+"Grok 4.3 (high)",xAI,1M,53,0.64,122,17.45,21.55
+"Muse Spark",Meta,262k,52,,,,
+"Claude Opus 4.7 (Non-reasoning, high)",Anthropic,1M,52,4.10,45,1.84,12.92
+"Claude Sonnet 4.6 (max)",Anthropic,1M,52,2.46,55,115.88,124.90
+"DeepSeek V4 Pro (Max)",DeepSeek,1M,52,0.18,49,1.89,101.08
+"GLM-5.1",Z AI,200k,51,0.90,65,1.20,67.40
+"GPT-5.5 (low)",OpenAI,922k,51,4.35,77,2.18,8.69
+"Qwen3.6 Plus",Alibaba,1M,50,0.43,52,2.97,118.55
+"DeepSeek V4 Pro (High)",DeepSeek,1M,50,0.18,48,1.93,53.58
+"GLM-5",Z AI,200k,50,0.66,74,1.36,50.22
+"MiniMax-M2.7",MiniMax,205k,50,0.22,57,1.99,53.57
+"MiMo-V2.5",Xiaomi,1M,49,0.39,100,3.01,27.92
+"GPT-5.4 mini (xhigh)",OpenAI,400k,49,0.65,175,5.39,8.25
+"Grok 4.3 (medium)",xAI,1M,49,0.64,112,13.08,17.56
+"GPT-5.4 (low)",OpenAI,1.05M,48,2.17,77,2.07,8.56
+"GLM-5-Turbo",Z AI,200k,47,,,,
+"DeepSeek V4 Flash (Max)",DeepSeek,1M,47,0.06,121,1.23,51.67
+"DeepSeek V4 Flash (High)",DeepSeek,1M,46,0.08,,,
+"Qwen3.6 27B",Alibaba,262k,46,0.90,65,3.73,42.38
+"Qwen3.5 397B A17B",Alibaba,262k,45,0.90,52,2.62,73.36
+"MiMo-V2-Omni-0327",Xiaomi,256k,45,0.34,97,2.25,27.93
+"Claude Sonnet 4.6 (Non-reasoning)",Anthropic,1M,44,2.46,44,1.32,12.59
+"GPT-5.4 nano (xhigh)",OpenAI,400k,44,0.18,159,5.06,8.20
+"Grok 4.3 (low)",xAI,1M,44,0.64,139,3.75,7.34
+"GLM-5.1 (low)",Z AI,200k,44,0.90,53,1.75,11.19
+"Qwen3.6 35B A3B",Alibaba,262k,43,0.37,179,2.45,16.41
+"MiMo-V2-Omni",Xiaomi,256k,43,0.00,102,2.49,27.05
+"Gemini 3.5 Flash (minimal)",Google,1M,43,1.31,214,0.87,3.21
+"Kimi K2.6 (low)",Kimi,256k,43,0.70,103,2.26,7.12
+"GLM 5V Turbo",Z AI,200k,43,,,,
+"Claude Sonnet 4.6 (Non-reasoning, Low Effort)",Anthropic,1M,43,2.46,44,1.31,12.80
+"Hy3-preview",Tencent,256k,42,0.14,103,3.85,28.04
+"Qwen3.5 122B A10B",Alibaba,262k,42,0.68,147,2.41,19.39
+"MiMo-V2-Flash (Feb 2026)",Xiaomi,256k,41,0.06,134,2.20,20.88
+"Gemini 3 Pro Preview (low)",Google,1M,41,1.74,,,
+"GPT-5.5 (Non-reasoning)",OpenAI,922k,41,4.35,73,1.03,7.88
+"GLM-5 (low)",Z AI,200k,41,0.66,63,1.77,9.70
+"Qwen3.5 397B A17B (low)",Alibaba,262k,40,0.90,53,2.49,11.96
+"DeepSeek V4 Pro",DeepSeek,1M,39,0.18,51,1.91,11.73
+"Mistral Medium 3.5",Mistral,256k,39,2.10,148,1.70,18.55
+"Gemma 4 31B",Google,256k,39,0.00,35,1.10,71.84
+"Qwen3.5 Omni Plus",Alibaba,256k,39,0.84,54,2.51,11.71
+"Grok 4.1 Fast",xAI,2M,39,,,,
+"Step 3.5 Flash 2603",StepFun,256k,38,0.00,157,1.21,17.09
+"Ring-2.6-1T",InclusionAI,262k,38,0.52,129,3.20,22.63
+"o3",OpenAI,200k,38,1.55,132,8.32,12.11
+"GPT-5.4 nano",OpenAI,400k,38,0.18,157,3.60,6.79
+"GPT-5.4 mini (medium)",OpenAI,400k,38,0.65,167,6.24,9.23
+"Kimi K2.5",Kimi,256k,37,0.49,46,3.10,13.92
+"Command A+",Cohere,192k,37,0.00,200,0.34,12.87
+"Qwen3.6 27B (low)",Alibaba,262k,37,0.90,65,3.78,11.51
+"Claude 4.5 Haiku",Anthropic,200k,37,0.82,103,14.85,19.69
+"DeepSeek V4 Flash",DeepSeek,1M,36,0.06,118,1.12,5.34
+"JT-35B-Flash",China Mobile,256k,36,,,,
+"NVIDIA Nemotron 3 Super",NVIDIA,1M,36,0.28,155,1.28,17.45
+"Qwen3.5 122B A10B (low)",Alibaba,262k,36,0.68,163,2.49,5.56
+"Nova 2.0 Pro Preview (medium)",Amazon,256k,36,1.47,125,13.67,33.61
+"MiMo-V2.5-Pro (low)",Xiaomi,1M,36,0.71,64,3.01,10.79
+"GPT-5.4 (Non-reasoning)",OpenAI,1.05M,35,2.17,76,0.78,7.39
+"Gemini 3 Flash",Google,1M,35,0.43,160,1.35,4.47
+"Gemini 2.5 Pro",Google,1M,35,1.34,147,19.73,23.15
+"Nova 2.0 Lite (high)",Amazon,1M,35,0.52,158,15.76,31.57
+"Hy3-preview (low)",Tencent,256k,34,0.14,90,4.20,9.75
+"Ling-2.6-1T",InclusionAI,262k,34,0.52,,,
+"Doubao Seed Code",ByteDance Seed,256k,34,,,,
+"Gemini 3.1 Flash-Lite Preview",Google,1M,34,0.22,332,5.74,7.25
+"gpt-oss-120b (high)",OpenAI,131k,33,0.20,326,0.83,8.50
+"Mercury 2",Inception,128k,33,0.14,894,4.16,4.72
+"Qwen3.5 9B",Alibaba,262k,32,0.11,55,0.69,46.31
+"Gemma 4 31B (low)",Google,256k,32,0.17,35,2.11,16.25
+"K-EXAONE",LG AI Research,256k,32,,,,
+"Grok 3 mini Reasoning (high)",xAI,1M,32,0.16,89,0.61,28.86
+"Nova 2.0 Pro Preview (low)",Amazon,256k,32,2.13,129,9.67,29.03
+"Trinity Large Thinking",Arcee AI,512k,32,0.24,149,1.13,17.91
+"Qwen3.6 35B A3B (low)",Alibaba,262k,32,0.56,173,2.43,5.32
+"Claude 4.5 Haiku (low)",Anthropic,200k,31,0.82,89,1.06,6.69
+"Grok 4.3",xAI,1M,31,0.64,153,0.62,3.90
+"Qwen3.5 35B A3B",Alibaba,262k,31,0.42,159,2.32,5.47
+"MiMo-V2-Flash",Xiaomi,256k,30,0.12,128,2.67,6.57
+"EXAONE 4.5 33B",LG AI Research,262k,30,,,,
+"Nova 2.0 Lite (medium)",Amazon,1M,30,0.52,169,13.85,28.68
+"ERNIE 5.0 Thinking Preview",Baidu,128k,29,,,,
+"Grok 4.20 0309 v2",xAI,2M,29,1.14,151,0.63,3.93
+"Grok Code Fast 1",xAI,256k,29,,,,
+"Nemotron Cascade 2 30B A3B",NVIDIA,1M,28,,,,
+"Qwen3 Coder Next",Alibaba,256k,28,0.43,168,1.28,4.26
+"Nova 2.0 Omni (medium)",Amazon,1M,28,0.52,,,
+"Mistral Small 4",Mistral,256k,28,0.20,164,0.73,15.97
+"Qwen3.5 9B (low)",Alibaba,262k,27,,,,
+"Magistral Medium 1.2",Mistral,128k,27,2.30,39,1.72,66.33
+"Gemma 4 26B A4B",Google,256k,27,0.16,75,1.47,8.13
+"Qwen3.5 4B",Alibaba,262k,27,0.04,169,0.46,15.29
+"DeepSeek R1 0528",DeepSeek,128k,27,1.64,,,
+"Qwen3 Next 80B A3B",Alibaba,262k,27,1.05,158,2.22,18.01
+"Ling 2.6 Flash",InclusionAI,262k,26,0.06,,,
+"Solar Pro 3",Upstage,128k,26,,,,
+"Qwen3.5 Omni Flash",Alibaba,256k,26,0.17,273,2.03,3.86
+"JT-MINI",China Mobile,128k,25,,,,
+"Nova 2.0 Lite (low)",Amazon,1M,25,0.52,150,11.63,28.29
+"gpt-oss-20B (high)",OpenAI,131k,25,0.07,239,0.78,11.23
+"gpt-oss-120b (low)",OpenAI,131k,24,0.20,345,0.85,8.10
+"GPT-5.4 nano (low)",OpenAI,400k,24,0.18,157,0.66,3.85
+"NVIDIA Nemotron 3 Nano",NVIDIA,1M,24,0.07,180,1.96,15.81
+"LongCat Flash Lite",LongCat,256k,24,0.00,92,6.94,12.38
+"Grok 4.1 Fast (low)",xAI,2M,24,,,,
+"K-EXAONE (low)",LG AI Research,256k,23,,,,
+"GPT-5.4 mini",OpenAI,400k,23,0.65,173,0.59,3.48
+"Nova 2.0 Omni (low)",Amazon,1M,23,0.52,,,
+"Nova 2.0 Pro Preview",Amazon,256k,23,2.13,127,1.09,5.03
+"Mi:dm K 2.5 Pro",Korea Telecom,128k,23,,,,
+"Mistral Large 3",Mistral,256k,23,0.60,51,1.09,10.81
+"Ring-1T",InclusionAI,128k,23,,,,
+"Qwen3.5 4B (low)",Alibaba,262k,23,0.04,173,0.42,3.31
+"INTELLECT-3",Prime Intellect,131k,22,,,,
+"Devstral 2",Mistral,256k,22,0.00,57,1.43,10.19
+"Solar Open 100B",Upstage,128k,22,,,,
+"Gemini 2.5 Flash-Lite (Sep)",Google,1M,22,0.07,,,
+"Nemotron 3 Nano Omni 30B A3B Reasoning",NVIDIA,256k,21,0.10,303,1.09,9.35
+"gpt-oss-20B (low)",OpenAI,131k,21,0.07,241,0.77,11.16
+"Qwen3 Next 80B A3B (low)",Alibaba,262k,20,0.65,145,2.41,5.85
+"Devstral Small 2",Mistral,256k,19,0.00,59,1.23,9.74
+"Gemini 2.5 Flash-Lite (Sep, low)",Google,1M,19,0.07,,,
+"Motif-2-12.7B",Motif Technologies,128k,19,,,,
+"Ling-1T",InclusionAI,128k,19,,,,
+"Nova Premier",Amazon,1M,19,2.18,34,2.89,17.53
+"Gemma 4 E4B",Google,128k,19,,,,
+"Llama Nemotron Super 49B v1.5",NVIDIA,128k,19,0.13,48,1.32,53.68
+"Mistral Small 4 (low)",Mistral,256k,19,0.20,157,0.77,3.94
+"Llama 3.3 Nemotron Super 49B",NVIDIA,128k,18,,,,
+"Llama 4 Maverick",Meta,1M,18,0.34,110,1.02,5.56
+"Magistral Small 1.2",Mistral,128k,18,0.60,107,0.83,24.30
+"Sarvam 105B (high)",Sarvam,128k,18,0.00,121,2.06,22.76
+"Nova 2.0 Lite",Amazon,1M,18,0.52,153,1.22,4.50
+"MiniCPM5-1B",OpenBMB,128k,18,,,,
+"Llama 3.1 405B",Meta,128k,17,3.13,30,2.29,18.76
+"EXAONE 4.0 32B",LG AI Research,131k,17,,,,
+"Nova 2.0 Omni",Amazon,1M,17,0.52,,,
+"Qwen3.5 2B",Alibaba,262k,16,0.03,,,
+"Nanbeige4.1-3B",Nanbeige,256k,16,,,,
+"Ministral 3 14B",Mistral,256k,16,0.20,65,0.81,8.47
+"DeepSeek R1 Distill Llama 70B",DeepSeek,128k,16,0.73,45,1.65,57.26
+"Falcon-H1R-7B",TII UAE,256k,16,,,,
+"Ling-flash-2.0",InclusionAI,128k,16,0.18,84,2.60,8.56
+"Qwen3 Omni 30B A3B",Alibaba,65.5k,16,0.32,87,1.98,30.58
+"Step3 VL 10B",StepFun,65.5k,15,,,,
+"Gemma 4 E2B",Google,128k,15,,,,
+"Llama Nemotron Ultra",NVIDIA,128k,15,0.72,52,2.38,50.05
+"ERNIE 4.5 300B A47B",Baidu,131k,15,0.36,25,3.50,23.25
+"Solar Pro 2",Upstage,65.5k,15,,,,
+"NVIDIA Nemotron Nano 12B v2 VL",NVIDIA,128k,15,0.24,,,
+"Ministral 3 8B",Mistral,256k,15,0.15,103,0.64,5.50
+"Gemma 4 E4B (low)",Google,128k,15,,,,
+"NVIDIA Nemotron Nano 9B V2",NVIDIA,131k,15,0.05,120,0.66,21.41
+"Granite 4.1 30B",IBM,131k,15,,,,
+"NVIDIA Nemotron 3 Nano 4B",NVIDIA,262k,15,,,,
+"Qwen3.5 2B (low)",Alibaba,262k,15,0.03,320,0.38,1.94
+"Llama Nemotron Super 49B v1.5 (low)",NVIDIA,128k,15,0.13,49,1.30,11.41
+"Llama 3.3 70B",Meta,128k,14,0.60,85,1.61,7.47
+"Llama 3.1 Nemotron Nano 4B v1.1",NVIDIA,128k,14,,,,
+"Kimi Linear 48B A3B Instruct",Kimi,1M,14,,,,
+"Llama 3.3 Nemotron Super 49B (low)",NVIDIA,128k,14,,,,
+"Ring-flash-2.0",InclusionAI,128k,14,0.18,,,
+"Solar Pro 2 (low)",Upstage,65.5k,14,,,,
+"Llama 4 Scout",Meta,10M,14,0.22,109,0.90,5.48
+"Command A",Cohere,256k,13,3.25,50,1.82,11.92
+"Llama 3.1 Nemotron 70B",NVIDIA,128k,13,1.20,291,0.49,2.21
+"NVIDIA Nemotron 3 Nano (low)",NVIDIA,1M,13,0.07,83,0.44,6.45
+"NVIDIA Nemotron Nano 9B V2 (low)",NVIDIA,131k,13,0.06,147,1.01,4.41
+"MiniCPM-V 4.6 1.3B",OpenBMB,262k,13,,,,
+"Granite 4.1 8B",IBM,131k,12,0.06,124,0.79,4.81
+"Sarvam 30B (high)",Sarvam,65.5k,12,0.00,167,1.94,16.93
+"Gemma 4 E2B (low)",Google,128k,12,,,,
+"R1 1776",Perplexity,128k,12,,,,
+"Llama 3.2 90B (Vision)",Meta,128k,12,1.38,59,1.17,9.66
+"EXAONE 4.0 32B (low)",LG AI Research,131k,12,,,,
+"Ministral 3 3B",Mistral,256k,11,0.10,188,0.52,3.17
+"Jamba 1.7 Large",AI21 Labs,256k,11,2.60,61,1.55,9.73
+"Granite 4.0 H Small",IBM,128k,11,0.08,350,10.34,11.77
+"Qwen3 Omni 30B A3B (low)",Alibaba,65.5k,11,0.32,97,1.98,7.15
+"Qwen3.5 0.8B",Alibaba,262k,11,0.01,,,
+"LFM2 24B A2B",Liquid AI,32.8k,10,0.04,167,0.54,3.52
+"Phi-4",Microsoft,16k,10,0.16,21,2.23,26.34
+"Nova Micro",Amazon,130k,10,0.03,308,0.93,2.55
+"NVIDIA Nemotron Nano 12B v2 VL (low)",NVIDIA,128k,10,0.24,237,1.03,3.14
+"Phi-4 Multimodal",Microsoft,128k,10,0.00,17,0.83,29.94
+"Qwen3.5 0.8B (low)",Alibaba,262k,10,0.01,73,0.46,7.30
+"Jamba Reasoning 3B",AI21 Labs,262k,10,,,,
+"Reka Flash 3",Reka AI,128k,10,0.26,,,
+"Ling-mini-2.0",InclusionAI,131k,9,,,,
+"Llama 3.2 11B (Vision)",Meta,128k,9,0.25,51,0.73,10.62
+"Granite 4.1 3B",IBM,131k,9,,,,
+"Phi-4 Mini",Microsoft,128k,8,0.00,,,
+"Exaone 4.0 1.2B",LG AI Research,64k,8,,,,
+"LFM2.5-1.2B-Thinking",Liquid AI,32k,8,,,,
+"Jamba 1.7 Mini",AI21 Labs,258k,8,,,,
+"LFM2 2.6B",Liquid AI,32.8k,8,0.00,,,
+"LFM2.5-1.2B-Instruct",Liquid AI,32k,8,0.00,,,
+"Granite 4.0 H 1B",IBM,128k,8,,,,
+"Gemma 3 270M",Google,32k,8,,,,
+"Apertus 70B Instruct",Swiss AI Initiative,65.5k,8,1.03,,,
+"Granite 4.0 Micro",IBM,128k,8,,,,
+"Granite 4.0 1B",IBM,128k,7,,,,
+"LFM2 8B A1B",Liquid AI,32.8k,7,0.00,,,
+"LFM2.5-VL-1.6B",Liquid AI,32k,6,0.00,,,
+"Granite 4.0 350M",IBM,32.8k,6,,,,
+"Apertus 8B Instruct",Swiss AI Initiative,65.5k,6,0.11,,,
+"Granite 4.0 H 350M",IBM,32.8k,5,,,,
+"Tiny Aya Global",Cohere,8.19k,5,0.00,,,`;
+
+        function parseCSV(csv) {
+            const lines = csv.trim().split('\n');
+            return lines.slice(1).map(line => {
+                const vals = [];
+                let current = '';
+                let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    if (line[i] === '"') { inQuotes = !inQuotes; }
+                    else if (line[i] === ',' && !inQuotes) { vals.push(current); current = ''; }
+                    else { current += line[i]; }
+                }
+                vals.push(current);
+                return {
+                    model: vals[0],
+                    creator: vals[1],
+                    context: vals[2],
+                    quality: parseFloat(vals[3]) || 0,
+                    price: vals[4] !== '' ? parseFloat(vals[4]) : null,
+                    speed: vals[5] !== '' ? parseFloat(vals[5]) : null,
+                    latency: vals[6] !== '' ? parseFloat(vals[6]) : null,
+                    responseTime: vals[7] !== '' ? parseFloat(vals[7]) : null
+                };
+            });
+        }
+
+        const data = parseCSV(csvData);
+
+        const creatorColors = {
+            'OpenAI': '#cedffe',
+            'Anthropic': '#ffbda1',
+            'Google': '#beeb96',
+            'Alibaba': '#ff9ff3',
+            'DeepSeek': '#48dbfb',
+            'xAI': '#f368e0',
+            'Meta': '#0abde3',
+            'Mistral': '#ff6b6b',
+            'NVIDIA': '#76b852',
+            'Amazon': '#ff9f43',
+            'Xiaomi': '#feca57',
+            'Z AI': '#a29bfe',
+            'Kimi': '#fd79a8',
+            'Tencent': '#00cec9',
+            'Cohere': '#e17055',
+            'IBM': '#74b9ff',
+            'MiniMax': '#dfe6e9',
+            'InclusionAI': '#55efc4',
+            'Other': '#636e72'
+        };
+
+        function getCreatorColor(creator) {
+            return creatorColors[creator] || creatorColors['Other'];
+        }
+
+        const creators = [...new Set(data.map(d => d.creator))];
+        const creatorCounts = {};
+        creators.forEach(c => { creatorCounts[c] = data.filter(d => d.creator === c).length; });
+        const sortedCreators = creators.sort((a, b) => creatorCounts[b] - creatorCounts[a]);
+
+        const state = {
+            opacity: 0.55,
+            colorscale: 'Viridis',
+            minQuality: 0,
+            surfaceStyle: 'smooth',
+            smoothness: 0.32,
+            scales: { x: 'linear', y: 'linear', z: 'linear' },
+            spinSpeed: 0.20,
+            tightness: 0.60,
+            layers: { points: true, frontier: true, surface: true, edges: true },
+            visibleCreators: {}
+        };
+        sortedCreators.forEach(c => state.visibleCreators[c] = true);
+
+        // The camera lives in state rather than being rebuilt per render, so that
+        // re-rendering (a slider, a creator toggle) doesn't snap the view back to
+        // the default -- which would also fight the auto-rotate loop.
+        const DEFAULT_CAMERA = { eye: { x: 1.8, y: 1.8, z: 1.2 }, center: { x: 0, y: 0, z: -0.1 } };
+        state.camera = JSON.parse(JSON.stringify(DEFAULT_CAMERA));
+
+        const axisMetrics = {
+            price:        { key: 'price',        label: 'Blended Price ($/M tokens)', prefix: '$', suffix: '',  betterDir: 'low' },
+            speed:        { key: 'speed',        label: 'Output Speed (tokens/s)',    prefix: '',  suffix: '',  betterDir: 'high' },
+            latency:      { key: 'latency',      label: 'Latency First Chunk (s)',    prefix: '',  suffix: 's', betterDir: 'low' },
+            responseTime: { key: 'responseTime', label: 'Total Response Time (s)',    prefix: '',  suffix: 's', betterDir: 'low' },
+            quality:      { key: 'quality',      label: 'Quality Index',              prefix: '',  suffix: '',  betterDir: 'high' }
+        };
+
+        // Axis transforms. Envelope geometry is fitted in *displayed* space: on a log
+        // axis the fit runs over log10(value), so the grid stays evenly spaced on
+        // screen instead of bunching at one end. log10 is monotone, so Pareto
+        // dominance and betterDir are unaffected.
+        const fwd = (v, s) => s === 'log' ? Math.log10(v) : v;
+        const inv = (t, s) => s === 'log' ? Math.pow(10, t) : t;
+
+        function filteredData(mx, my, mz) {
+            const sx = state.scales.x, sy = state.scales.y, sz = state.scales.z;
+            return data.filter(d =>
+                state.visibleCreators[d.creator] &&
+                d.quality >= state.minQuality &&
+                d[mx.key] !== null && d[my.key] !== null && d[mz.key] !== null &&
+                // A log axis has no room for zero or negative values (several models
+                // are priced at $0.00). Drop them here so the envelope is fitted to
+                // exactly what gets drawn, rather than letting Plotly discard them
+                // after the surface has already been built around them.
+                (sx !== 'log' || d[mx.key] > 0) &&
+                (sy !== 'log' || d[my.key] > 0) &&
+                (sz !== 'log' || d[mz.key] > 0)
+            );
+        }
+
+        function computePareto(fd, mx, my, mz) {
+            const isBetter = (a, b, m) => m.betterDir === 'high' ? a >= b : a <= b;
+            const isStrict = (a, b, m) => m.betterDir === 'high' ? a > b : a < b;
+            const pareto = [];
+            for (const pt of fd) {
+                const dominated = fd.some(p =>
+                    p !== pt &&
+                    isBetter(p[mx.key], pt[mx.key], mx) &&
+                    isBetter(p[my.key], pt[my.key], my) &&
+                    isBetter(p[mz.key], pt[mz.key], mz) &&
+                    (isStrict(p[mx.key], pt[mx.key], mx) ||
+                     isStrict(p[my.key], pt[my.key], my) ||
+                     isStrict(p[mz.key], pt[mz.key], mz))
+                );
+                if (!dominated) pareto.push(pt);
+            }
+            return pareto;
+        }
+
+        // Smooth Pareto ceiling.
+        //
+        // Think of a paraboloid hung under every model and the surface as the skin
+        // stretched over all of them: ceiling(X,Y) = max_k ( g_k - droop * dist^2 ).
+        // At a model's own location its distance is zero, so the skin is pinned at
+        // or above that model -- nothing can poke through, by construction.
+        //
+        // The distance is measured one-sided ("free disposal"): a model counts in
+        // full anywhere its own budget and speed are already met, and is penalized
+        // only toward the corner where the ask gets strictly harder than what it
+        // delivers. So the ceiling plateaus as constraints relax and falls away only
+        // toward cheaper/faster -- a Pareto staircase rather than a hill that decays
+        // in every direction, which is what let the old fit float above the frontier.
+        //
+        // A hard max would crease at every peg, so we take the log-sum-exp soft-max,
+        // which is smooth and (because log-sum-exp >= max) still never dips below.
+        // `droop` is the fit knob: steep clings to individual models, shallow rolls
+        // out into the broad shape of the tradeoff.
+        function buildEnvelopeSurface(models, mx, my, mz) {
+            if (models.length < 3) return null;
+
+            // Everything below runs in transformed (displayed) units; the grid is
+            // mapped back to raw values at the end, since Plotly's log axes take
+            // raw data and apply the log themselves.
+            const sx = state.scales.x, sy = state.scales.y, sz = state.scales.z;
+            const allX = models.map(d => fwd(d[mx.key], sx));
+            const allY = models.map(d => fwd(d[my.key], sy));
+            const allZ = models.map(d => fwd(d[mz.key], sz));
+            const xmin = Math.min(...allX), xmax = Math.max(...allX);
+            const ymin = Math.min(...allY), ymax = Math.max(...allY);
+            const zmin = Math.min(...allZ), zmax = Math.max(...allZ);
+            const xr = xmax - xmin, yr = ymax - ymin, zr = (zmax - zmin) || 1;
+            if (!xr || !yr) return null;
+
+            // Solve in "goodness" units (1 = best) so the envelope is always an upper
+            // bound, then map back -- a ceiling for quality/speed, a floor for price.
+            const up = mz.betterDir === 'high';
+            const nx = allX.map(v => (v - xmin) / xr);
+            const ny = allY.map(v => (v - ymin) / yr);
+            const ng = allZ.map(v => { const t = (v - zmin) / zr; return up ? t : 1 - t; });
+            // Droop is unbounded, so in the far corner -- where no model satisfies the
+            // constraints at all -- the raw formula dives arbitrarily far below the
+            // data (negative quality, negative price). Clamp to the observed range:
+            // the honest floor for "nothing here qualifies" is the worst model we have,
+            // not some extrapolated number. The lift pass below repairs the tiny
+            // deficit clamping can introduce at the very top.
+            const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+            const zAt = t => zmin + zr * (up ? clamp01(t) : 1 - clamp01(t));
+
+            const n = 80;                                               // grid resolution
+            const droop = 0.35 * Math.pow(500, 1 - state.smoothness);   // paraboloid falloff
+            const beta = 250;                                           // soft-max sharpness
+
+            const gx = [], gy = [], gz = [];
+            for (let i = 0; i < n; i++) gx.push(xmin + xr * i / (n - 1));
+            for (let j = 0; j < n; j++) gy.push(ymin + yr * j / (n - 1));
+
+            // Which way each input axis has to move before a model stops qualifying.
+            const xUp = mx.betterDir === 'high', yUp = my.betterDir === 'high';
+
+            const g = new Float64Array(models.length);
+            for (let j = 0; j < n; j++) {
+                const row = [];
+                const Y = j / (n - 1);
+                for (let i = 0; i < n; i++) {
+                    const X = i / (n - 1);
+                    let M = -Infinity;
+                    for (let k = 0; k < models.length; k++) {
+                        const rx = X - nx[k], ry = Y - ny[k];
+                        const dx = xUp ? (rx > 0 ? rx : 0) : (rx < 0 ? -rx : 0);
+                        const dy = yUp ? (ry > 0 ? ry : 0) : (ry < 0 ? -ry : 0);
+                        const v = ng[k] - droop * (dx * dx + dy * dy);
+                        g[k] = v;
+                        if (v > M) M = v;
+                    }
+                    // Shift by the max before exponentiating: keeps the sum in range
+                    // and makes the soft-max's excess over the hard max explicit.
+                    let sum = 0;
+                    for (let k = 0; k < models.length; k++) sum += Math.exp(beta * (g[k] - M));
+                    row.push(zAt(M + Math.log(sum) / beta));
+                }
+                gz.push(row);
+            }
+
+            // The continuous ceiling is a strict bound, but the rendered sheet is
+            // bilinear between grid nodes, which shaves convex peaks. Lift by the
+            // largest shortfall so the drawn geometry bounds the data too.
+            const sign = up ? 1 : -1;
+            let lift = 0;
+            for (let k = 0; k < models.length; k++) {
+                const fx = nx[k] * (n - 1), fy = ny[k] * (n - 1);
+                const i0 = Math.min(n - 2, Math.floor(fx)), j0 = Math.min(n - 2, Math.floor(fy));
+                const tx = fx - i0, ty = fy - j0;
+                const at = gz[j0][i0] * (1 - tx) * (1 - ty) + gz[j0][i0 + 1] * tx * (1 - ty) +
+                           gz[j0 + 1][i0] * (1 - tx) * ty + gz[j0 + 1][i0 + 1] * tx * ty;
+                const short = sign * (allZ[k] - at);
+                if (short > lift) lift = short;
+            }
+            if (lift > 0) {
+                for (let j = 0; j < n; j++)
+                    for (let i = 0; i < n; i++) gz[j][i] += sign * lift;
+            }
+
+            // Note: the sheet is deliberately NOT clamped to zero here. When the axis
+            // is a cost, the envelope is a floor, and strictly bounding the $0.00
+            // models requires dipping a hair under them; clamping at zero lets
+            // bilinear interpolation pull it back above those models and reinstates
+            // the poke-through this whole function exists to prevent. The overshoot is
+            // a fraction of a percent of range, and the axis `rangemode` keeps it out
+            // of view. Runaway negatives -- the actual problem -- are handled by
+            // clamp01 above, at the source.
+
+            // Back to raw units for Plotly.
+            if (sz === 'log') {
+                for (let j = 0; j < n; j++)
+                    for (let i = 0; i < n; i++) gz[j][i] = inv(gz[j][i], sz);
+            }
+            return { x: gx.map(v => inv(v, sx)), y: gy.map(v => inv(v, sy)), z: gz };
+        }
+
+        // --- Faceted envelope -------------------------------------------------
+        // Delaunay triangulation (Bowyer-Watson) over the X/Y projection, then an
+        // alpha-shape pass that drops triangles spanning empty space. The result
+        // is a polygonal skin whose vertices are the frontier models themselves.
+
+        function orientCCW(pts, t) {
+            const a = pts[t[0]], b = pts[t[1]], c = pts[t[2]];
+            const cr = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+            return cr > 0 ? t : [t[0], t[2], t[1]];
+        }
+
+        function inCircumcircle(p, a, b, c) {
+            const ax = a[0] - p[0], ay = a[1] - p[1];
+            const bx = b[0] - p[0], by = b[1] - p[1];
+            const cx = c[0] - p[0], cy = c[1] - p[1];
+            return (ax * ax + ay * ay) * (bx * cy - by * cx)
+                 - (bx * bx + by * by) * (ax * cy - ay * cx)
+                 + (cx * cx + cy * cy) * (ax * by - ay * bx) > 0;
+        }
+
+        function delaunay2D(points) {
+            const n = points.length;
+            if (n < 3) return [];
+
+            let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
+            for (const p of points) {
+                if (p[0] < minx) minx = p[0];
+                if (p[0] > maxx) maxx = p[0];
+                if (p[1] < miny) miny = p[1];
+                if (p[1] > maxy) maxy = p[1];
+            }
+            const dmax = Math.max(maxx - minx, maxy - miny) || 1;
+            const midx = (minx + maxx) / 2, midy = (miny + maxy) / 2;
+
+            const pts = points.concat([
+                [midx - 20 * dmax, midy - 20 * dmax],
+                [midx + 20 * dmax, midy - 20 * dmax],
+                [midx, midy + 20 * dmax]
+            ]);
+            let tris = [orientCCW(pts, [n, n + 1, n + 2])];
+
+            for (let i = 0; i < n; i++) {
+                const keep = [], edges = [];
+                for (const t of tris) {
+                    if (inCircumcircle(pts[i], pts[t[0]], pts[t[1]], pts[t[2]])) {
+                        edges.push([t[0], t[1]], [t[1], t[2]], [t[2], t[0]]);
+                    } else {
+                        keep.push(t);
+                    }
+                }
+                // Edges shared by two removed triangles are interior to the cavity.
+                const boundary = edges.filter((e, a) => !edges.some((f, b) =>
+                    b !== a && f[0] === e[1] && f[1] === e[0]));
+                tris = keep;
+                for (const e of boundary) tris.push(orientCCW(pts, [e[0], e[1], i]));
+            }
+
+            return tris.filter(t => t[0] < n && t[1] < n && t[2] < n);
+        }
+
+        function buildFacetedMesh(pareto, mx, my, mz) {
+            if (pareto.length < 3) return null;
+
+            // Collapse models sharing an X/Y footprint to the best Z, so the
+            // envelope stays single-valued and the triangulation stays non-degenerate.
+            const beats = (a, b) => mz.betterDir === 'high' ? a > b : a < b;
+            const byXY = new Map();
+            for (const d of pareto) {
+                const key = d[mx.key] + '|' + d[my.key];
+                const cur = byXY.get(key);
+                if (!cur || beats(d[mz.key], cur[mz.key])) byXY.set(key, d);
+            }
+            const pts = [...byXY.values()];
+            if (pts.length < 3) return null;
+
+            // Vertices stay in raw units for Plotly; the triangulation is done on
+            // displayed coordinates so facet tightness means the same thing on a
+            // log axis as on a linear one.
+            const xs = pts.map(d => d[mx.key]);
+            const ys = pts.map(d => d[my.key]);
+            const zs = pts.map(d => d[mz.key]);
+            const tx = xs.map(v => fwd(v, state.scales.x));
+            const ty = ys.map(v => fwd(v, state.scales.y));
+            const xmin = Math.min(...tx), xmax = Math.max(...tx);
+            const ymin = Math.min(...ty), ymax = Math.max(...ty);
+            const xr = (xmax - xmin) || 1, yr = (ymax - ymin) || 1;
+            const norm = tx.map((v, q) => [(v - xmin) / xr, (ty[q] - ymin) / yr]);
+
+            const tris = delaunay2D(norm);
+            if (!tris.length) return null;
+
+            // Alpha shape: a triangle survives only if its longest edge is short
+            // relative to the (unit-normalized) footprint.
+            const span = t => {
+                const e = (a, b) => Math.hypot(norm[a][0] - norm[b][0], norm[a][1] - norm[b][1]);
+                return Math.max(e(t[0], t[1]), e(t[1], t[2]), e(t[2], t[0]));
+            };
+            const spans = tris.map(span);
+            const limit = 0.06 + 1.5 * Math.pow(1 - state.tightness, 2);
+            let faces = tris.filter((t, i) => spans[i] <= limit);
+            if (!faces.length) {
+                // Slider cranked past what the data supports — keep the tightest quarter.
+                const order = tris.map((t, i) => i).sort((a, b) => spans[a] - spans[b]);
+                faces = order.slice(0, Math.max(1, Math.ceil(tris.length / 4))).map(i => tris[i]);
+            }
+
+            const ex = [], ey = [], ez = [], seen = new Set();
+            for (const t of faces) {
+                for (const [a, b] of [[t[0], t[1]], [t[1], t[2]], [t[2], t[0]]]) {
+                    const key = a < b ? a + ':' + b : b + ':' + a;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    ex.push(xs[a], xs[b], null);
+                    ey.push(ys[a], ys[b], null);
+                    ez.push(zs[a], zs[b], null);
+                }
+            }
+
+            return {
+                x: xs, y: ys, z: zs,
+                i: faces.map(t => t[0]),
+                j: faces.map(t => t[1]),
+                k: faces.map(t => t[2]),
+                count: faces.length,
+                ex, ey, ez
+            };
+        }
+
+        // Where the envelope is pinned right on a frontier model the two coincide,
+        // which z-fights and swallows the diamond. Nudge the markers just proud of the
+        // sheet -- through it, to the exterior -- so they sit on top of it and are easy
+        // to pick out and click. This is intentional and shouldn't be "corrected" to
+        // the interior: the diamonds are drawn a hair past the ceiling they define, so
+        // read them as sitting on the surface, not beating it. Hover always reports
+        // each model's true numbers, and the nudge is skipped when no surface is drawn.
+        const MARKER_NUDGE = 0.02;
+
+        function frontierMarkerZ(pareto, fd, mz) {
+            if (!state.layers.surface) return pareto.map(d => d[mz.key]);
+            const s = state.scales.z;
+            const tz = fd.map(d => fwd(d[mz.key], s));
+            const zr = (Math.max(...tz) - Math.min(...tz)) || 1;
+            const off = (mz.betterDir === 'high' ? 1 : -1) * MARKER_NUDGE * zr;
+            return pareto.map(d => {
+                const v = inv(fwd(d[mz.key], s) + off, s);
+                // On a cost axis "exterior" means downward, which would push the $0.00
+                // models below the zero floor and out of the plotted range entirely --
+                // unselectable, the opposite of the point. Log axes can't hit this,
+                // having already excluded non-positive values.
+                return s === 'linear' && v < 0 ? 0 : v;
+            });
+        }
+
+        function buildTraces() {
+            const mx = axisMetrics[document.getElementById('axis-x').value];
+            const my = axisMetrics[document.getElementById('axis-y').value];
+            const mz = axisMetrics[document.getElementById('axis-z').value];
+
+            const fd = filteredData(mx, my, mz);
+            const pareto = computePareto(fd, mx, my, mz);
+            const paretoSet = new Set(pareto);
+            const traces = [];
+
+            if (state.layers.points) {
+                const byCreator = {};
+                fd.forEach(d => {
+                    if (paretoSet.has(d) && state.layers.frontier) return;
+                    (byCreator[d.creator] = byCreator[d.creator] || []).push(d);
+                });
+                Object.entries(byCreator).forEach(([creator, pts]) => {
+                    traces.push({
+                        type: 'scatter3d',
+                        mode: 'markers',
+                        x: pts.map(d => d[mx.key]),
+                        y: pts.map(d => d[my.key]),
+                        z: pts.map(d => d[mz.key]),
+                        marker: {
+                            size: 4,
+                            color: getCreatorColor(creator),
+                            opacity: 0.8,
+                            line: { width: 0.5, color: 'rgba(255,255,255,0.3)' }
+                        },
+                        name: creator,
+                        text: pts.map(d => d.model),
+                        customdata: pts.map(d => [
+                            mx.prefix + d[mx.key] + mx.suffix,
+                            my.prefix + d[my.key] + my.suffix,
+                            mz.prefix + d[mz.key] + mz.suffix
+                        ]),
+                        hovertemplate: '<b>%{text}</b><br>' +
+                            mx.label + ': %{customdata[0]}<br>' +
+                            my.label + ': %{customdata[1]}<br>' +
+                            mz.label + ': %{customdata[2]}<br>' +
+                            '<extra>%{fullData.name}</extra>'
+                    });
+                });
+            }
+
+            if (state.layers.frontier && pareto.length > 0) {
+                traces.push({
+                    type: 'scatter3d',
+                    mode: 'markers',
+                    x: pareto.map(d => d[mx.key]),
+                    y: pareto.map(d => d[my.key]),
+                    z: frontierMarkerZ(pareto, fd, mz),
+                    marker: {
+                        size: 7,
+                        color: '#00ffcc',
+                        symbol: 'diamond',
+                        opacity: 1,
+                        line: { width: 1.5, color: '#fff' }
+                    },
+                    name: 'Frontier (' + pareto.length + ')',
+                    text: pareto.map(d => d.model),
+                    customdata: pareto.map(d => [
+                        mx.prefix + d[mx.key] + mx.suffix,
+                        my.prefix + d[my.key] + my.suffix,
+                        mz.prefix + d[mz.key] + mz.suffix
+                    ]),
+                    hovertemplate: '<b>%{text}</b> (frontier)<br>' +
+                        mx.label + ': %{customdata[0]}<br>' +
+                        my.label + ': %{customdata[1]}<br>' +
+                        mz.label + ': %{customdata[2]}<br>' +
+                        '<extra>Performance Envelope</extra>'
+                });
+            }
+
+            if (state.surfaceStyle === 'smooth') {
+                if (state.layers.surface) {
+                    // Fit against every visible model, not just the frontier: the
+                    // dominated ones already sit below, but including them is what
+                    // makes "nothing pokes through" hold everywhere on the sheet.
+                    const surf = buildEnvelopeSurface(fd, mx, my, mz);
+                    if (surf) {
+                        traces.push({
+                            type: 'surface',
+                            x: surf.x,
+                            y: surf.y,
+                            z: surf.z,
+                            colorscale: state.colorscale,
+                            opacity: state.opacity,
+                            showscale: false,
+                            contours: {
+                                z: { show: true, usecolormap: true, highlightcolor: '#fff', width: 2, project: { z: false } }
+                            },
+                            lighting: { ambient: 0.55, diffuse: 0.7, specular: 0.3, roughness: 0.45, fresnel: 0.15 },
+                            lightposition: { x: 100, y: 200, z: 300 },
+                            name: 'Envelope Surface',
+                            showlegend: true,
+                            // The sheet sits between the camera and the models it
+                            // bounds, so leaving it pickable lets it swallow every
+                            // marker hover. Identifying models matters more than the
+                            // sheet's own readout, so it yields whenever the frontier
+                            // is drawn and takes hover back when that layer is off.
+                            hoverinfo: state.layers.frontier ? 'skip' : undefined,
+                            hovertemplate: mx.label + ': ' + mx.prefix + '%{x:.2f}' + mx.suffix + '<br>' +
+                                my.label + ': ' + my.prefix + '%{y:.2f}' + my.suffix + '<br>' +
+                                'Best attainable ' + mz.label + ': ' + mz.prefix + '%{z:.1f}' + mz.suffix +
+                                '<extra>Envelope</extra>'
+                        });
+                    }
+                }
+            } else if (state.layers.surface || state.layers.edges) {
+                const mesh = buildFacetedMesh(pareto, mx, my, mz);
+                if (mesh) {
+                    if (state.layers.surface) {
+                        traces.push({
+                            type: 'mesh3d',
+                            x: mesh.x, y: mesh.y, z: mesh.z,
+                            i: mesh.i, j: mesh.j, k: mesh.k,
+                            intensity: mesh.z,
+                            intensitymode: 'vertex',
+                            colorscale: state.colorscale,
+                            opacity: state.opacity,
+                            flatshading: true,
+                            showscale: false,
+                            hoverinfo: 'skip',
+                            lighting: { ambient: 0.62, diffuse: 0.85, specular: 0.15, roughness: 0.55, fresnel: 0.1 },
+                            lightposition: { x: 100, y: 200, z: 300 },
+                            name: 'Envelope (' + mesh.count + ' facets)',
+                            showlegend: true
+                        });
+                    }
+                    if (state.layers.edges) {
+                        traces.push({
+                            type: 'scatter3d',
+                            mode: 'lines',
+                            x: mesh.ex, y: mesh.ey, z: mesh.ez,
+                            line: { color: 'rgba(0, 255, 204, 0.5)', width: 2 },
+                            hoverinfo: 'skip',
+                            name: 'Facet Edges',
+                            showlegend: !state.layers.surface
+                        });
+                    }
+                }
+            }
+
+            return { traces, mx, my, mz };
+        }
+
+        function makeAxis(metric, scale) {
+            const log = scale === 'log';
+            return {
+                title: { text: metric.label + (log ? ' (log)' : ''), font: { size: 12, color: '#aaa' } },
+                type: log ? 'log' : 'linear',
+                // Every metric here is non-negative, so don't let autorange pad below
+                // zero. Skipped on log axes, where the range is in log units and
+                // "nonnegative" would mean >= 1, cutting off sub-dollar prices.
+                rangemode: log ? undefined : 'nonnegative',
+                gridcolor: 'rgba(255,255,255,0.06)',
+                zerolinecolor: 'rgba(255,255,255,0.1)',
+                backgroundcolor: 'rgba(0,0,0,0)',
+                tickfont: { color: '#888', size: 10 },
+                tickprefix: metric.prefix || undefined,
+                ticksuffix: metric.suffix || undefined,
+                autorange: metric.betterDir === 'low' ? 'reversed' : true
+            };
+        }
+
+        const plotDiv = document.getElementById('plot-container');
+
+        function render() {
+            const { traces, mx, my, mz } = buildTraces();
+
+            const layout = {
+                title: {
+                    text: 'Model Performance Envelope',
+                    font: { color: '#ddd', size: 16 },
+                    x: 0.5, y: 0.97
+                },
+                scene: {
+                    xaxis: makeAxis(mx, state.scales.x),
+                    yaxis: makeAxis(my, state.scales.y),
+                    zaxis: makeAxis(mz, state.scales.z),
+                    bgcolor: 'rgba(15, 12, 41, 1)',
+                    camera: state.camera,
+                    aspectratio: { x: 1, y: 1, z: 0.8 }
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                margin: { l: 0, r: 0, t: 40, b: 10 },
+                showlegend: true,
+                legend: {
+                    x: 0.02, y: 0.98,
+                    bgcolor: 'rgba(20, 20, 40, 0.7)',
+                    bordercolor: 'rgba(255,255,255,0.1)',
+                    borderwidth: 1,
+                    font: { color: '#ccc', size: 11 }
+                },
+                font: { family: 'Segoe UI, system-ui, sans-serif' }
+            };
+
+            Plotly.react(plotDiv, traces, layout, {
+                responsive: true,
+                displayModeBar: true,
+                modeBarButtonsToRemove: ['toImage', 'sendDataToCloud'],
+                displaylogo: false
+            });
+        }
+
+        // Creator toggles
+        const togglesDiv = document.getElementById('creator-toggles');
+        sortedCreators.forEach(c => {
+            const row = document.createElement('div');
+            row.className = 'model-toggle';
+            const safeId = 'toggle-' + c.replace(/\s+/g, '_');
+            row.innerHTML = `
+                <input type="checkbox" id="${safeId}" checked>
+                <span class="model-dot" style="background: ${getCreatorColor(c)}"></span>
+                <label for="${safeId}">${c} (${creatorCounts[c]})</label>
+            `;
+            row.querySelector('input').addEventListener('change', (e) => {
+                state.visibleCreators[c] = e.target.checked;
+                render();
+            });
+            togglesDiv.appendChild(row);
+        });
+
+        // Axis selectors
+        document.getElementById('axis-x').addEventListener('change', render);
+        document.getElementById('axis-y').addEventListener('change', render);
+        document.getElementById('axis-z').addEventListener('change', render);
+
+        // Per-axis linear/log scale
+        document.querySelectorAll('.scale-toggle').forEach(group => {
+            const axis = group.dataset.axis;
+            group.querySelectorAll('.scale-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (state.scales[axis] === btn.dataset.scale) return;
+                    state.scales[axis] = btn.dataset.scale;
+                    group.querySelectorAll('.scale-btn')
+                        .forEach(b => b.classList.toggle('active', b === btn));
+                    render();
+                });
+            });
+        });
+
+        // Min quality slider
+        const minQ = document.getElementById('min-quality');
+        const minQVal = document.getElementById('min-quality-val');
+        minQ.addEventListener('input', () => {
+            state.minQuality = parseInt(minQ.value);
+            minQVal.textContent = state.minQuality;
+            render();
+        });
+
+        // Opacity slider
+        const opacity = document.getElementById('opacity');
+        const opacityVal = document.getElementById('val-opacity');
+        opacity.addEventListener('input', () => {
+            state.opacity = parseFloat(opacity.value);
+            opacityVal.textContent = state.opacity.toFixed(2);
+            render();
+        });
+
+        // Surface style + shape sliders
+        const tightGroup = document.getElementById('tightness-group');
+        const smoothGroup = document.getElementById('smoothness-group');
+        document.getElementById('surface-style').addEventListener('change', (e) => {
+            state.surfaceStyle = e.target.value;
+            const faceted = state.surfaceStyle === 'faceted';
+            tightGroup.style.display = faceted ? '' : 'none';
+            smoothGroup.style.display = faceted ? 'none' : '';
+            render();
+        });
+
+        const smooth = document.getElementById('smoothness');
+        const smoothVal = document.getElementById('val-smoothness');
+        smooth.addEventListener('input', () => {
+            state.smoothness = parseFloat(smooth.value);
+            smoothVal.textContent = state.smoothness.toFixed(2);
+            render();
+        });
+
+        const tight = document.getElementById('tightness');
+        const tightVal = document.getElementById('val-tightness');
+        tight.addEventListener('input', () => {
+            state.tightness = parseFloat(tight.value);
+            tightVal.textContent = state.tightness.toFixed(2);
+            render();
+        });
+
+        // Color scale
+        document.getElementById('colorscale').addEventListener('change', (e) => {
+            state.colorscale = e.target.value;
+            render();
+        });
+
+        // Layer toggles. Scoped to [data-layer] so the camera buttons, which share
+        // the .toggle-btn styling, don't fall through into state.layers.
+        document.querySelectorAll('.toggle-btn[data-layer]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.classList.toggle('active');
+                state.layers[btn.dataset.layer] = btn.classList.contains('active');
+                render();
+            });
+        });
+
+        // --- Auto-rotate ------------------------------------------------------
+        // Orbits the eye around the z-axis, keeping the current radius and height,
+        // so it spins from wherever the user left the view rather than snapping.
+        const SPIN_FPS = 30;
+        const spinBtn = document.getElementById('spin-btn');
+        const spinGroup = document.getElementById('spin-speed-group');
+        let spinning = false, spinRaf = null, lastFrame = 0, dragging = false;
+
+        function spinStep(now) {
+            if (!spinning) { spinRaf = null; return; }
+            spinRaf = requestAnimationFrame(spinStep);
+            // Hold position while the user is dragging, so we don't fight the orbit.
+            if (dragging) { lastFrame = now; return; }
+            if (now - lastFrame < 1000 / SPIN_FPS) return;
+            // Clamp dt so a backgrounded tab doesn't resume with a huge jump.
+            const dt = Math.min((now - lastFrame) / 1000, 0.1);
+            lastFrame = now;
+
+            const e = state.camera.eye;
+            const r = Math.hypot(e.x, e.y);
+            const a = Math.atan2(e.y, e.x) + state.spinSpeed * dt;
+            state.camera = Object.assign({}, state.camera, {
+                eye: { x: Math.cos(a) * r, y: Math.sin(a) * r, z: e.z }
+            });
+            Plotly.relayout(plotDiv, { 'scene.camera': state.camera });
+        }
+
+        function setSpinning(on) {
+            spinning = on;
+            spinBtn.classList.toggle('active', on);
+            spinGroup.style.display = on ? '' : 'none';
+            if (on && !spinRaf) {
+                lastFrame = performance.now();
+                spinRaf = requestAnimationFrame(spinStep);
+            }
+        }
+
+        spinBtn.addEventListener('click', () => setSpinning(!spinning));
+
+        document.getElementById('reset-view').addEventListener('click', () => {
+            state.camera = JSON.parse(JSON.stringify(DEFAULT_CAMERA));
+            Plotly.relayout(plotDiv, { 'scene.camera': state.camera });
+        });
+
+        const spinSpeed = document.getElementById('spin-speed');
+        const spinVal = document.getElementById('val-spin');
+        spinSpeed.addEventListener('input', () => {
+            state.spinSpeed = parseFloat(spinSpeed.value);
+            spinVal.textContent = state.spinSpeed.toFixed(2);
+        });
+
+        plotDiv.addEventListener('mousedown', () => { dragging = true; });
+        plotDiv.addEventListener('touchstart', () => { dragging = true; }, { passive: true });
+        window.addEventListener('mouseup', () => { dragging = false; });
+        window.addEventListener('touchend', () => { dragging = false; });
+
+        render();
+
+        // Track manual orbits so state.camera stays authoritative for both the next
+        // render and the spin loop's starting position.
+        plotDiv.on('plotly_relayout', (ev) => {
+            const cam = ev['scene.camera'];
+            if (cam && cam.eye) state.camera = cam;
+        });
+    </script>
+</body>
+</html>
