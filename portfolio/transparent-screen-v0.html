@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#04070A">
+<title>Window — v0</title>
+<style>
+  :root{
+    --panel: rgba(6,12,17,0.66);
+    --line: rgba(168,214,228,0.20);
+    --line-strong: rgba(168,214,228,0.42);
+    --text: #E4F1F4;
+    --dim: #8298A1;
+    --accent: #4DD8E6;
+    --warn: #FFB454;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html,body{
+    height:100%;
+    background:#04070A;
+    color:var(--text);
+    font-family:var(--sans);
+    overflow:hidden;
+    overscroll-behavior:none;
+    -webkit-user-select:none; user-select:none;
+    -webkit-touch-callout:none;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:none;
+  }
+
+  #feed{
+    position:fixed; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    transform-origin:center center;
+    will-change:transform;
+    background:#04070A;
+  }
+
+  /* ---- shared panel treatment ---- */
+  .panel{
+    background:var(--panel);
+    -webkit-backdrop-filter:blur(18px) saturate(1.3);
+    backdrop-filter:blur(18px) saturate(1.3);
+    border:1px solid var(--line);
+  }
+
+  .eyebrow{
+    font-size:9.5px;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    color:var(--dim);
+    font-weight:600;
+    white-space:nowrap;
+  }
+
+  .num{ font-family:var(--mono); font-variant-numeric:tabular-nums; }
+
+  /* ---- readout, top ---- */
+  #readout{
+    position:fixed;
+    top:calc(env(safe-area-inset-top) + 10px);
+    left:12px; right:12px;
+    display:flex; gap:6px;
+    border-radius:11px;
+    padding:9px 11px;
+    align-items:baseline;
+    justify-content:space-between;
+    z-index:5;
+  }
+  #readout .cell{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  #readout .val{ font-size:12px; letter-spacing:-0.01em; white-space:nowrap; }
+  #readout .val.flag{ color:var(--warn); }
+  #readout .val.good{ color:var(--accent); }
+
+  /* ---- sensor crop diagram ---- */
+  #scope{
+    position:fixed;
+    right:12px;
+    bottom:calc(env(safe-area-inset-bottom) + 214px);
+    width:104px;
+    border-radius:10px;
+    padding:8px;
+    z-index:5;
+  }
+  #scope svg{ display:block; width:100%; height:auto; }
+  #scope .cap{
+    display:flex; justify-content:space-between;
+    margin-top:6px; align-items:baseline;
+  }
+  #scope .pct{ font-family:var(--mono); font-size:11px; color:var(--accent); }
+
+  /* ---- controls, bottom ---- */
+  #controls{
+    position:fixed;
+    left:12px; right:12px;
+    bottom:calc(env(safe-area-inset-bottom) + 12px);
+    border-radius:14px;
+    padding:13px 14px 12px;
+    z-index:5;
+    max-height:calc(100% - env(safe-area-inset-top) - 90px);
+    overflow-y:auto;
+    touch-action:pan-y;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .field{ margin-bottom:11px; }
+  .field .head{
+    display:flex; justify-content:space-between;
+    align-items:baseline; gap:10px; margin-bottom:6px;
+  }
+  .field .head .v{ font-family:var(--mono); font-size:13px; color:var(--accent); white-space:nowrap; }
+
+  input[type=range]{
+    -webkit-appearance:none; appearance:none;
+    width:100%; height:22px; background:transparent;
+    touch-action:none;
+  }
+  input[type=range]::-webkit-slider-runnable-track{
+    height:2px; background:var(--line-strong); border-radius:2px;
+  }
+  input[type=range]::-moz-range-track{
+    height:2px; background:var(--line-strong); border-radius:2px;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:20px; height:20px; margin-top:-9px;
+    border-radius:50%;
+    background:#0A1318;
+    border:1.5px solid var(--accent);
+    box-shadow:0 0 0 4px rgba(77,216,230,0.10);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:18px; height:18px; border-radius:50%;
+    background:#0A1318; border:1.5px solid var(--accent);
+  }
+  input[type=range]:focus-visible::-webkit-slider-thumb{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  .row{ display:flex; gap:7px; }
+  .row + .row{ margin-top:7px; }
+
+  button{
+    flex:1;
+    font-family:var(--sans);
+    font-size:11px; font-weight:600;
+    letter-spacing:0.05em; text-transform:uppercase;
+    color:var(--text);
+    background:rgba(255,255,255,0.05);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 4px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  button:active{ background:rgba(77,216,230,0.16); }
+  button.on{ background:rgba(77,216,230,0.18); border-color:var(--accent); color:var(--accent); }
+  button:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  button[disabled]{ opacity:0.35; }
+
+  /* ---- lens picker ---- */
+  #lensRow{ margin-bottom:11px; }
+  #lensRow.hidden{ display:none; }
+
+  /* ---- advanced drawer ---- */
+  #adv{ display:none; border-top:1px solid var(--line); margin-top:12px; padding-top:12px; }
+  #adv.open{ display:block; }
+  .note{ font-size:10.5px; color:var(--dim); line-height:1.45; margin-top:2px; }
+
+  /* ---- start / error overlay ---- */
+  #gate{
+    position:fixed; inset:0; z-index:20;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:18px; padding:32px;
+    background:#04070A;
+    text-align:center;
+  }
+  #gate h1{
+    font-size:15px; font-weight:600;
+    letter-spacing:0.24em; text-transform:uppercase;
+  }
+  #gate p{ font-size:13px; line-height:1.6; color:var(--dim); max-width:31ch; }
+  #gate code{ font-family:var(--mono); font-size:12px; color:var(--accent); }
+  #gate button{ flex:0; padding:13px 30px; font-size:12px; }
+  #gate .rule{ width:44px; height:1px; background:var(--line-strong); }
+  #gateHint{ font-size:11px !important; }
+
+  .hidden{ display:none !important; }
+
+  #ui{ transition:opacity 180ms ease; }
+  #ui.away{ opacity:0; pointer-events:none; }
+  @media (prefers-reduced-motion: reduce){ #ui{ transition:none; } }
+
+  #tapHint{
+    position:fixed; bottom:calc(env(safe-area-inset-bottom) + 14px);
+    left:0; right:0; text-align:center; z-index:4;
+    font-size:10px; letter-spacing:0.16em; text-transform:uppercase;
+    color:rgba(255,255,255,0.4);
+    text-shadow:0 1px 6px rgba(0,0,0,0.8);
+    pointer-events:none;
+  }
+
+  #toast{
+    position:fixed; z-index:30;
+    top:calc(env(safe-area-inset-top) + 74px);
+    left:50%; transform:translateX(-50%);
+    padding:8px 14px; border-radius:8px;
+    background:rgba(6,12,17,0.9);
+    border:1px solid var(--line-strong);
+    font-size:11px; letter-spacing:0.05em;
+    opacity:0; transition:opacity 200ms ease;
+    pointer-events:none; white-space:nowrap;
+  }
+  #toast.show{ opacity:1; }
+
+  #frozen{
+    position:fixed; z-index:4;
+    top:calc(env(safe-area-inset-top) + 74px);
+    left:50%; transform:translateX(-50%);
+    font-size:10px; letter-spacing:0.18em; text-transform:uppercase;
+    color:var(--warn); text-shadow:0 1px 6px rgba(0,0,0,0.8);
+    pointer-events:none;
+  }
+</style>
+</head>
+<body>
+
+<video id="feed" playsinline muted autoplay></video>
+
+<div id="ui">
+  <div id="readout" class="panel">
+    <div class="cell">
+      <span class="eyebrow">Source</span>
+      <span class="val num" id="rSrc">&mdash;</span>
+    </div>
+    <div class="cell">
+      <span class="eyebrow">Zoom</span>
+      <span class="val num" id="rZoom">&mdash;</span>
+    </div>
+    <div class="cell">
+      <span class="eyebrow">Optical</span>
+      <span class="val num" id="rOpt">&mdash;</span>
+    </div>
+    <div class="cell">
+      <span class="eyebrow">Detail</span>
+      <span class="val num" id="rSharp">&mdash;</span>
+    </div>
+  </div>
+
+  <div id="scope" class="panel">
+    <svg viewBox="0 0 100 70" aria-label="Portion of the camera frame in use">
+      <rect x="1" y="1" width="98" height="68" rx="2"
+            fill="rgba(255,255,255,0.04)" stroke="rgba(168,214,228,0.30)" stroke-width="1"/>
+      <line x1="50" y1="30" x2="50" y2="40" stroke="rgba(168,214,228,0.30)" stroke-width="0.75"/>
+      <line x1="45" y1="35" x2="55" y2="35" stroke="rgba(168,214,228,0.30)" stroke-width="0.75"/>
+      <rect id="cropBox" x="40" y="25" width="20" height="20"
+            fill="rgba(77,216,230,0.14)" stroke="#4DD8E6" stroke-width="1.25"/>
+    </svg>
+    <div class="cap">
+      <span class="eyebrow">In use</span>
+      <span class="pct" id="rPct">&mdash;</span>
+    </div>
+  </div>
+
+  <div id="controls" class="panel">
+    <div id="lensRow" class="row hidden"></div>
+
+    <div class="field">
+      <div class="head">
+        <span class="eyebrow">Magnification</span>
+        <span class="v"><span id="vZoom">2.20</span>&times;</span>
+      </div>
+      <input type="range" id="zoom" min="1" max="12" step="0.01" value="2.2"
+             aria-label="Magnification">
+    </div>
+
+    <div class="field">
+      <div class="head">
+        <span class="eyebrow">Implied viewing distance</span>
+        <span class="v"><span id="vDist">40</span> cm</span>
+      </div>
+      <input type="range" id="dist" min="12" max="100" step="0.5" value="40"
+             aria-label="Implied viewing distance in centimetres">
+    </div>
+
+    <div class="row">
+      <button id="bFreeze">Freeze</button>
+      <button id="bAdv">Calibrate</button>
+      <button id="bHide">Hide</button>
+    </div>
+
+    <div id="adv">
+      <div class="field">
+        <div class="head">
+          <span class="eyebrow">Screen width</span>
+          <span class="v"><span id="vW">66</span> mm</span>
+        </div>
+        <input type="range" id="sw" min="45" max="90" step="0.5" value="66"
+               aria-label="Physical screen width in millimetres">
+      </div>
+      <div class="field">
+        <div class="head">
+          <span class="eyebrow">Lens field of view</span>
+          <span class="v"><span id="vF">70.0</span>&deg;</span>
+        </div>
+        <input type="range" id="fov" min="14" max="130" step="0.5" value="70"
+               aria-label="Camera field of view in degrees along the long axis">
+      </div>
+      <p class="note">
+        Zoom until a straight edge behind the phone meets the same edge on screen,
+        then hold that pose and read the distance. If the two sliders disagree with
+        a tape measure, correct screen width first, field of view second &mdash; those two
+        are what v1 inherits.
+      </p>
+      <div class="row" style="margin-top:11px">
+        <button id="bCopy">Copy constants</button>
+        <button id="bReset">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p id="tapHint" class="hidden">Tap to show controls</p>
+<p id="frozen" class="hidden">Frozen</p>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<div id="gate">
+  <h1>Window</h1>
+  <div class="rule"></div>
+  <p id="gateMsg">Points the rear camera through the screen and crops it to what your eye
+  would actually see through a hole this size. Pinch to zoom; tap to hide the controls.</p>
+  <button id="bStart">Start camera</button>
+  <p id="gateHint"></p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  var video   = $('feed');
+  var gate    = $('gate');
+  var gateMsg = $('gateMsg');
+  var gateHint= $('gateHint');
+  var ui      = $('ui');
+  var tapHint = $('tapHint');
+  var frozen  = $('frozen');
+  var toastEl = $('toast');
+  var cropBox = $('cropBox');
+  var lensRow = $('lensRow');
+
+  var LS = 'window.v0';
+
+  // Viewing distance is the one number here that belongs to the person rather
+  // than the hardware, so it is what gets persisted. Magnification is derived:
+  // the same 2.2x means a different distance on a different frame size or lens,
+  // which is exactly how a saved calibration used to evaporate on a lens switch.
+  var state = {
+    distMm: 400,        // how far the eye is from the screen — the calibration
+    screenWmm: 66,      // physical width of the display
+    deviceId: null,     // preferred rear lens
+    fovByDevice: {},    // deg along the video's long axis, per lens, at 1x
+    fovDeg: 70,
+    zoom: 2.2           // derived from distMm once the frame size is known
+  };
+
+  var vw = 0, vh = 0;          // intrinsic video size
+  var track = null;            // live video track
+  var hwMax = 1;               // largest native zoom the track allows
+  var hwMin = 1;
+  var hwZoom = 1;              // what we last asked the track for
+  var hwPending = null;        // debounce timer for applyConstraints
+  var lenses = [];             // [{deviceId, name}]
+  var wakeLock = null;
+  var uiVisible = true;
+  var isFrozen = false;
+
+  var rad = function(d){ return d * Math.PI / 180; };
+  var clamp = function(v, lo, hi){ return v < lo ? lo : (v > hi ? hi : v); };
+
+  /* ------------------------------------------------------------------ *
+   * Persistence
+   * ------------------------------------------------------------------ */
+  function load(){
+    try{
+      var raw = localStorage.getItem(LS);
+      if(!raw) return;
+      var s = JSON.parse(raw);
+      if(typeof s.distMm === 'number')    state.distMm = clamp(s.distMm, 120, 1000);
+      if(typeof s.screenWmm === 'number') state.screenWmm = clamp(s.screenWmm, 45, 90);
+      if(typeof s.deviceId === 'string')  state.deviceId = s.deviceId;
+      if(s.fovByDevice && typeof s.fovByDevice === 'object') state.fovByDevice = s.fovByDevice;
+    }catch(_){}
+  }
+
+  function save(){
+    try{ localStorage.setItem(LS, JSON.stringify({
+      distMm: state.distMm,
+      screenWmm: state.screenWmm,
+      deviceId: state.deviceId,
+      fovByDevice: state.fovByDevice
+    })); }catch(_){}
+  }
+
+  /* Modern iPhones sit near 460 ppi. Only ever an opening guess — the
+     Calibrate drawer is there because this number has to be trued up by eye. */
+  function guessScreenWidth(){
+    var dpr = window.devicePixelRatio || 2;
+    var cssW = Math.min(screen.width, screen.height);
+    var mm = (cssW * dpr / 460) * 25.4;
+    return clamp(Math.round(mm * 2) / 2, 45, 90);
+  }
+
+  /* Rough field of view for a lens we have only a label for. Corrected by
+     hand in Calibrate; these just stop the first frame being nonsense. */
+  function guessFov(name){
+    if(/ultra/i.test(name)) return 104;
+    if(/tele/i.test(name))  return 26;
+    return 70;
+  }
+
+  function fovFor(deviceId, name){
+    if(deviceId && state.fovByDevice[deviceId] != null) return state.fovByDevice[deviceId];
+    return guessFov(name || '');
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Geometry
+   *
+   * The camera is rectilinear, so image offset goes with tan(angle), and the
+   * screen is a flat rectangle at a fixed distance, so screen offset also goes
+   * with tan(angle). The map from screen position to source pixel is therefore
+   * a single linear scale — the same on both axes — which is why one number
+   * ("magnification") is the entire model at v0.
+   *
+   *   focal_px = (vw/2) / tan(fovX/2)
+   *   zoom     = sw * d / (cover * focal_px * screenWmm)
+   *
+   * cover undoes the scaling object-fit:cover already applied.
+   * ------------------------------------------------------------------ */
+  function geom(){
+    var sw = window.innerWidth, sh = window.innerHeight;
+    var cover = Math.max(sw / vw, sh / vh);
+
+    // The quoted FOV is along the frame's long axis; derive one focal length.
+    var half = rad(state.fovDeg) / 2;
+    var focalPx = (Math.max(vw, vh) / 2) / Math.tan(half);
+
+    return { sw:sw, sh:sh, cover:cover, focalPx:focalPx };
+  }
+
+  function zoomToDistMm(z){
+    var g = geom();
+    return z * g.cover * g.focalPx * state.screenWmm / g.sw;
+  }
+
+  function distMmToZoom(dmm){
+    var g = geom();
+    return g.sw * dmm / (g.cover * g.focalPx * state.screenWmm);
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Render
+   * ------------------------------------------------------------------ */
+  function recompute(){
+    if(!vw || !vh) return;
+
+    var g = geom();
+
+    // Split the magnification: let the sensor do as much as it can, since a
+    // native crop keeps real pixels where a CSS scale only invents them.
+    var useHw = clamp(state.zoom, 1, hwMax);
+    var css   = state.zoom / useHw;
+
+    video.style.transform = 'scale(' + css.toFixed(4) + ')';
+    requestHwZoom(useHw);
+
+    /* ---- readouts ---- */
+    // Source pixels spanning the screen, after both zoom stages. The scale is
+    // isotropic, but screen and sensor aspect differ, so the two fractions do not.
+    var fx = clamp(g.sw / (g.cover * css * vw), 0.005, 1);
+    var fy = clamp(g.sh / (g.cover * css * vh), 0.005, 1);
+
+    cropBox.setAttribute('width',  (98 * fx).toFixed(2));
+    cropBox.setAttribute('height', (68 * fy).toFixed(2));
+    cropBox.setAttribute('x', (50 - 49 * fx).toFixed(2));
+    cropBox.setAttribute('y', (35 - 34 * fy).toFixed(2));
+
+    var areaPct = fx * fy * 100;
+    $('rPct').textContent = areaPct < 1 ? areaPct.toFixed(2) + '%' : areaPct.toFixed(1) + '%';
+
+    $('rSrc').textContent  = vw + '×' + vh;
+    $('rZoom').textContent = state.zoom.toFixed(2) + '×';
+
+    var optEl = $('rOpt');
+    optEl.textContent = useHw.toFixed(2) + '×';
+    optEl.className = 'val num' + (useHw > 1.005 ? ' good' : '');
+
+    // Source device-pixels per screen device pixel. Below 1.0 we are upscaling.
+    var dpr = window.devicePixelRatio || 1;
+    // Past the sensor's optical limit the ISP is upscaling too, so this reads
+    // optimistically on a track with a large native zoom range. Still the right
+    // number to watch: it is what the CSS stage alone would have had to invent.
+    var sharp = 1 / (g.cover * css * dpr);
+    var shEl = $('rSharp');
+    shEl.textContent = sharp.toFixed(2) + '×';
+    shEl.className = 'val num' + (sharp < 1 ? ' flag' : ' good');
+  }
+
+  /* Native zoom is a round trip to the camera, so coalesce the pinch. */
+  function requestHwZoom(z){
+    if(hwMax <= 1 || !track) return;
+    z = clamp(z, hwMin, hwMax);
+    if(Math.abs(z - hwZoom) < 0.01) return;
+    hwZoom = z;
+    if(hwPending) return;
+    hwPending = setTimeout(function(){
+      hwPending = null;
+      try{ track.applyConstraints({ advanced: [{ zoom: hwZoom }] }); }catch(_){}
+    }, 90);
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Sliders — magnification and distance are two views of one number.
+   *
+   * opts.slider  write the magnification slider's own handle (skip while dragging it)
+   * opts.intent  the user chose this magnification, so adopt the distance it implies
+   * ------------------------------------------------------------------ */
+  function setZoom(z, opts){
+    opts = opts || {};
+    state.zoom = clamp(z, 1, 12);
+
+    if(opts.slider !== false){ $('zoom').value = state.zoom; }
+    $('vZoom').textContent = state.zoom.toFixed(2);
+
+    // The distance actually on screen, which is not the intent when a long lens
+    // cannot open up far enough to reach it.
+    var actualMm = vw ? zoomToDistMm(state.zoom) : state.distMm;
+    if(opts.intent) state.distMm = actualMm;
+
+    var cm = actualMm / 10;
+    $('dist').value = clamp(cm, 12, 100);
+    $('vDist').textContent = cm >= 100 ? '100+' : cm.toFixed(0);
+
+    recompute();
+    save();
+  }
+
+  /* Frame size, orientation or lens changed: hold the calibrated distance and
+     let the magnification move to wherever that distance now lands. */
+  function applyGeometry(){
+    if(!vw) return;
+    setZoom(distMmToZoom(state.distMm), { slider:true, intent:false });
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Camera
+   * ------------------------------------------------------------------ */
+  function videoConstraints(deviceId){
+    var v = {
+      // The crop discards most of the frame, so resolution is the entire
+      // budget for how sharp the illusion reads.
+      width:  { ideal: 3840 },
+      height: { ideal: 2160 },
+      frameRate: { ideal: 30 }
+    };
+    if(deviceId) v.deviceId = { exact: deviceId };
+    else         v.facingMode = { ideal: 'environment' };
+    return v;
+  }
+
+  async function openStream(deviceId){
+    // Release first, then acquire: a second concurrent getUserMedia mutes the
+    // live track on iOS with no way to bring it back.
+    stopStream();
+    var stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: videoConstraints(deviceId)
+    });
+    video.srcObject = stream;
+    track = stream.getVideoTracks()[0] || null;
+    await video.play();
+
+    hwMax = 1; hwZoom = 1;
+    if(track && track.getCapabilities){
+      try{
+        var caps = track.getCapabilities();
+        // Some drivers report zoom in units of their own; only trust a range
+        // that starts at or below 1, where the units are unambiguously factors.
+        if(caps && caps.zoom && caps.zoom.max > 1 && caps.zoom.min <= 1){
+          hwMax = caps.zoom.max;
+          hwMin = caps.zoom.min;
+        }
+      }catch(_){}
+    }
+
+    if(isFrozen) setFrozen(false);
+
+    var settings = track && track.getSettings ? track.getSettings() : {};
+    if(settings.deviceId) state.deviceId = settings.deviceId;
+    state.fovDeg = fovFor(state.deviceId, track ? track.label : '');
+    $('fov').value = state.fovDeg;
+    $('vF').textContent = state.fovDeg.toFixed(1);
+
+    settle();
+  }
+
+  function stopStream(){
+    var old = video.srcObject;
+    if(old && old.getTracks){ old.getTracks().forEach(function(t){ t.stop(); }); }
+  }
+
+  function settle(){
+    var w = video.videoWidth, h = video.videoHeight;
+    if(!w || !h) return;
+    vw = w; vh = h;
+    applyGeometry();
+  }
+
+  async function start(){
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      fail('No camera API here.',
+           location.protocol === 'https:' ? ''
+             : 'Needs an https:// origin — file:// and plain http won’t do.');
+      return;
+    }
+    $('bStart').disabled = true;
+    try{
+      // Open the default rear camera first: on iOS the device labels stay
+      // blank until a permission grant exists, so enumeration comes second.
+      await openStream(null);
+      await buildLensList();
+      if(state.deviceId && lenses.length > 1){
+        var stored = lenses.filter(function(l){ return l.deviceId === state.deviceId; })[0];
+        if(stored && stored.deviceId !== currentDeviceId()){
+          try{ await openStream(stored.deviceId); }catch(_){}
+        }
+      }
+      markActiveLens();
+      requestWakeLock();
+      gate.classList.add('hidden');
+    }catch(err){
+      $('bStart').disabled = false;
+      fail('Camera unavailable.',
+           err && err.name === 'NotAllowedError'
+             ? 'Permission was declined. Reload and allow camera access.'
+             : (err && err.message) || '');
+    }
+  }
+
+  function currentDeviceId(){
+    var s = track && track.getSettings ? track.getSettings() : {};
+    return s.deviceId || null;
+  }
+
+  function fail(msg, hint){
+    gateMsg.textContent = msg;
+    gateHint.textContent = hint || '';
+    gate.classList.remove('hidden');
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Lens picker — a telephoto starts several stops of magnification ahead,
+   * which is worth far more to this illusion than any amount of upscaling.
+   * ------------------------------------------------------------------ */
+  function shortName(label){
+    if(/ultra/i.test(label)) return 'Ultra';
+    if(/tele/i.test(label))  return 'Tele';
+    if(/wide|dual|triple|back|rear/i.test(label)) return 'Wide';
+    return label.slice(0, 8) || 'Lens';
+  }
+
+  async function buildLensList(){
+    lenses = [];
+    if(!navigator.mediaDevices.enumerateDevices) return;
+    var devices;
+    try{ devices = await navigator.mediaDevices.enumerateDevices(); }
+    catch(_){ return; }
+
+    var cams = devices.filter(function(d){ return d.kind === 'videoinput'; });
+    var back = cams.filter(function(d){ return /back|rear|environment/i.test(d.label); });
+    var pool = back.length ? back : cams;
+
+    var seen = {};
+    pool.forEach(function(d){
+      if(!d.deviceId) return;
+      var n = shortName(d.label);
+      if(seen[n]) return;             // iOS lists virtual duplicates of the same optic
+      seen[n] = true;
+      lenses.push({ deviceId: d.deviceId, name: n, label: d.label });
+    });
+
+    // Widest first reads more naturally than enumeration order.
+    var order = { Ultra:0, Wide:1, Tele:2 };
+    lenses.sort(function(a,b){
+      return (order[a.name] != null ? order[a.name] : 9) - (order[b.name] != null ? order[b.name] : 9);
+    });
+
+    lensRow.innerHTML = '';
+    if(lenses.length < 2){ lensRow.classList.add('hidden'); return; }
+    lenses.forEach(function(l){
+      var b = document.createElement('button');
+      b.textContent = l.name;
+      b.dataset.id = l.deviceId;
+      b.addEventListener('click', function(){ switchLens(l.deviceId); });
+      lensRow.appendChild(b);
+    });
+    lensRow.classList.remove('hidden');
+    layoutScope();
+  }
+
+  function markActiveLens(){
+    var cur = currentDeviceId();
+    Array.prototype.forEach.call(lensRow.children, function(b){
+      b.classList.toggle('on', b.dataset.id === cur);
+    });
+  }
+
+  async function switchLens(deviceId){
+    if(deviceId === currentDeviceId()) return;
+    try{
+      await openStream(deviceId);
+      save();
+      markActiveLens();
+      toast(shortName(track ? track.label : '') + ' · ' + state.fovDeg.toFixed(0) + '°');
+    }catch(err){
+      toast('That lens refused to open');
+    }
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Wake lock — the whole point is holding the phone up and staring at it
+   * ------------------------------------------------------------------ */
+  async function requestWakeLock(){
+    if(!('wakeLock' in navigator)) return;
+    try{
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', function(){ wakeLock = null; });
+    }catch(_){}
+  }
+
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'visible'){
+      if(!wakeLock) requestWakeLock();
+      // iOS suspends the decoder on backgrounding and does not always resume.
+      if(!isFrozen && video.srcObject && video.paused){ video.play().catch(function(){}); }
+    }
+  });
+
+  /* ------------------------------------------------------------------ *
+   * Pinch to zoom
+   * ------------------------------------------------------------------ */
+  var pinch = null, pinchEndedAt = 0;
+
+  function touchDist(t){
+    var dx = t[0].clientX - t[1].clientX;
+    var dy = t[0].clientY - t[1].clientY;
+    return Math.hypot(dx, dy);
+  }
+
+  function inControls(target){
+    return !!(target && target.closest && target.closest('#controls, #readout, #scope, #gate'));
+  }
+
+  document.addEventListener('touchstart', function(e){
+    if(inControls(e.target)) return;
+    if(e.touches.length === 2){
+      pinch = { d: touchDist(e.touches), z: state.zoom };
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function(e){
+    if(pinch && e.touches.length === 2){
+      var d = touchDist(e.touches);
+      if(pinch.d > 0){ setZoom(pinch.z * (d / pinch.d), { slider:true, intent:true }); }
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchend', function(e){
+    if(e.touches.length < 2 && pinch){ pinch = null; pinchEndedAt = Date.now(); }
+  }, { passive: true });
+
+  // Trackpad / desktop equivalent, handy while iterating on a laptop.
+  window.addEventListener('wheel', function(e){
+    if(inControls(e.target)) return;
+    if(!vw) return;
+    setZoom(state.zoom * Math.exp(-e.deltaY * 0.002), { slider:true, intent:true });
+    e.preventDefault();
+  }, { passive: false });
+
+  /* ------------------------------------------------------------------ *
+   * UI plumbing
+   * ------------------------------------------------------------------ */
+  var toastTimer = null;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 1600);
+  }
+
+  // The controls grow when the drawer opens or a lens row appears; keep the
+  // diagram parked just above them rather than at a guessed offset.
+  function layoutScope(){
+    var h = $('controls').getBoundingClientRect().height;
+    $('scope').style.bottom = 'calc(env(safe-area-inset-bottom) + ' + Math.round(h + 20) + 'px)';
+  }
+
+  function toggleUI(){
+    uiVisible = !uiVisible;
+    ui.classList.toggle('away', !uiVisible);
+    tapHint.classList.toggle('hidden', uiVisible);
+  }
+
+  $('zoom').addEventListener('input', function(){
+    setZoom(parseFloat(this.value), { slider:false, intent:true });
+  });
+
+  $('dist').addEventListener('input', function(){
+    var cm = parseFloat(this.value);
+    state.distMm = cm * 10;
+    if(!vw){ $('vDist').textContent = cm.toFixed(0); save(); return; }
+    // A long lens bottoms out at 1x well beyond arm's length. setZoom writes the
+    // handle back to the distance it could actually reach, while the calibration
+    // above keeps the distance you asked for, ready for the next lens.
+    setZoom(distMmToZoom(state.distMm), { slider:true, intent:false });
+  });
+
+  $('sw').addEventListener('input', function(){
+    state.screenWmm = parseFloat(this.value);
+    $('vW').textContent = state.screenWmm;
+    // While calibrating, the magnification is the part your eye already agreed
+    // with — hold it, and let the corrected geometry restate the distance.
+    setZoom(state.zoom, { slider:false, intent:true });
+  });
+
+  $('fov').addEventListener('input', function(){
+    state.fovDeg = parseFloat(this.value);
+    $('vF').textContent = state.fovDeg.toFixed(1);
+    if(state.deviceId) state.fovByDevice[state.deviceId] = state.fovDeg;
+    setZoom(state.zoom, { slider:false, intent:true });
+  });
+
+  $('bStart').addEventListener('click', start);
+
+  function setFrozen(on){
+    isFrozen = on;
+    if(on){ video.pause(); } else { video.play().catch(function(){}); }
+    var b = $('bFreeze');
+    b.classList.toggle('on', on);
+    b.textContent = on ? 'Live' : 'Freeze';
+    frozen.classList.toggle('hidden', !on);
+  }
+
+  $('bFreeze').addEventListener('click', function(){ setFrozen(!isFrozen); });
+
+  $('bAdv').addEventListener('click', function(){
+    var open = $('adv').classList.toggle('open');
+    this.classList.toggle('on', open);
+    layoutScope();
+  });
+
+  $('bHide').addEventListener('click', toggleUI);
+
+  $('bCopy').addEventListener('click', function(){
+    var g = geom();
+    var dmm = zoomToDistMm(state.zoom);
+    if(!vw){ toast('Start the camera first'); return; }
+    var hmm = state.screenWmm * g.sh / g.sw;
+    var out = {
+      version: 'v0',
+      capturedAt: new Date().toISOString(),
+      viewport: { cssPx: [g.sw, g.sh], dpr: window.devicePixelRatio || 1 },
+      screen: { widthMm: +state.screenWmm.toFixed(1), heightMm: +hmm.toFixed(1) },
+      camera: {
+        label: track ? track.label : null,
+        deviceId: state.deviceId,
+        sourcePx: [vw, vh],
+        fovDegLongAxis: state.fovDeg,
+        focalPx: +g.focalPx.toFixed(1),
+        opticalZoomUsed: +clamp(state.zoom, 1, hwMax).toFixed(2),
+        opticalZoomMax: +hwMax.toFixed(2)
+      },
+      solved: {
+        magnification: +state.zoom.toFixed(3),
+        viewingDistanceCm: +(dmm / 10).toFixed(1),
+        coverScale: +g.cover.toFixed(4)
+      },
+      // What v1's frustum needs, in metres, at the pose that looked right here.
+      v1Seed: {
+        eyeZ: +(dmm / 1000).toFixed(4),
+        screenW: +(state.screenWmm / 1000).toFixed(4),
+        screenH: +(hmm / 1000).toFixed(4)
+      }
+    };
+    var text = JSON.stringify(out, null, 2);
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text)
+        .then(function(){ toast('Constants copied'); })
+        .catch(function(){ showConstants(text); });
+    }else{
+      showConstants(text);
+    }
+  });
+
+  function showConstants(text){
+    // Clipboard is gated in some in-app browsers; fall back to a selectable field.
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;inset:auto 12px 12px 12px;height:44vh;z-index:40;' +
+      'background:#04070A;color:#E4F1F4;border:1px solid rgba(168,214,228,0.42);' +
+      'border-radius:10px;padding:10px;font:11px ui-monospace,monospace;';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    var ok = false;
+    try{ ok = document.execCommand('copy'); }catch(_){}
+    if(ok){ ta.remove(); toast('Constants copied'); return; }
+    toast('Select and copy, then tap it');
+    ta.addEventListener('click', function(){ ta.remove(); });
+  }
+
+  $('bReset').addEventListener('click', function(){
+    try{ localStorage.removeItem(LS); }catch(_){}
+    state.distMm = 400;
+    state.screenWmm = guessScreenWidth();
+    state.fovByDevice = {};
+    state.fovDeg = guessFov(track ? track.label : '');
+    $('sw').value = state.screenWmm;
+    $('vW').textContent = state.screenWmm;
+    $('fov').value = state.fovDeg;
+    $('vF').textContent = state.fovDeg.toFixed(1);
+    if(vw) applyGeometry(); else setZoom(2.2, { slider:true, intent:false });
+    toast('Reset');
+  });
+
+  // The feed fills the viewport, so it is the tap target for showing and hiding.
+  video.addEventListener('click', function(){
+    if(Date.now() - pinchEndedAt < 400) return;   // tail of a pinch, not a tap
+    toggleUI();
+  });
+
+  video.addEventListener('loadedmetadata', settle);
+  video.addEventListener('resize', settle);
+
+  window.addEventListener('resize', function(){ applyGeometry(); layoutScope(); });
+  window.addEventListener('orientationchange', function(){
+    setTimeout(function(){ applyGeometry(); layoutScope(); }, 350);
+  });
+
+  /* ------------------------------------------------------------------ *
+   * Boot
+   * ------------------------------------------------------------------ */
+  load();
+  if(!localStorageHas('screenWmm')) state.screenWmm = guessScreenWidth();
+
+  function localStorageHas(key){
+    try{
+      var raw = localStorage.getItem(LS);
+      return !!raw && JSON.parse(raw)[key] != null;
+    }catch(_){ return false; }
+  }
+
+  $('sw').value = state.screenWmm;
+  $('vW').textContent = state.screenWmm;
+  layoutScope();
+  $('zoom').value = state.zoom;
+  $('vZoom').textContent = state.zoom.toFixed(2);
+  $('dist').value = clamp(state.distMm / 10, 12, 100);
+  $('vDist').textContent = (state.distMm / 10).toFixed(0);
+  $('fov').value = state.fovDeg;
+  $('vF').textContent = state.fovDeg.toFixed(1);
+
+  if(location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1'){
+    gateHint.textContent = 'Serve this over https:// — Safari blocks the camera otherwise.';
+  }else if(!('wakeLock' in navigator)){
+    gateHint.textContent = 'No wake lock here — the screen may sleep while you hold it up.';
+  }
+})();
+</script>
+</body>
+</html>

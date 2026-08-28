@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Window</title>
+<style>
+  :root{
+    --panel: rgba(6,12,17,0.66);
+    --line: rgba(168,214,228,0.20);
+    --line-strong: rgba(168,214,228,0.42);
+    --text: #E4F1F4;
+    --dim: #8298A1;
+    --accent: #4DD8E6;
+    --warn: #FFB454;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html,body{
+    height:100%;
+    background:#04070A;
+    color:var(--text);
+    font-family:var(--sans);
+    overflow:hidden;
+    -webkit-user-select:none; user-select:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  #feed{
+    position:fixed; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    transform-origin:center center;
+    will-change:transform;
+    background:#04070A;
+  }
+
+  /* ---- shared panel treatment ---- */
+  .panel{
+    background:var(--panel);
+    -webkit-backdrop-filter:blur(18px) saturate(1.3);
+    backdrop-filter:blur(18px) saturate(1.3);
+    border:1px solid var(--line);
+  }
+
+  .eyebrow{
+    font-size:9.5px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--dim);
+    font-weight:600;
+  }
+
+  .num{ font-family:var(--mono); font-variant-numeric:tabular-nums; }
+
+  /* ---- readout, top ---- */
+  #readout{
+    position:fixed;
+    top:calc(env(safe-area-inset-top) + 10px);
+    left:12px; right:12px;
+    display:flex; gap:8px;
+    border-radius:11px;
+    padding:9px 12px;
+    align-items:baseline;
+    justify-content:space-between;
+    z-index:5;
+  }
+  #readout .cell{ display:flex; flex-direction:column; gap:3px; }
+  #readout .val{ font-size:12.5px; letter-spacing:-0.01em; }
+  #readout .val.flag{ color:var(--warn); }
+
+  /* ---- sensor crop diagram: the signature element ---- */
+  #scope{
+    position:fixed;
+    right:12px;
+    bottom:calc(env(safe-area-inset-bottom) + 186px);
+    width:104px;
+    border-radius:10px;
+    padding:8px;
+    z-index:5;
+  }
+  #scope svg{ display:block; width:100%; height:auto; }
+  #scope .cap{
+    display:flex; justify-content:space-between;
+    margin-top:6px; align-items:baseline;
+  }
+  #scope .pct{ font-family:var(--mono); font-size:11px; color:var(--accent); }
+
+  /* ---- controls, bottom ---- */
+  #controls{
+    position:fixed;
+    left:12px; right:12px;
+    bottom:calc(env(safe-area-inset-bottom) + 12px);
+    border-radius:14px;
+    padding:14px 14px 12px;
+    z-index:5;
+  }
+
+  .field{ margin-bottom:12px; }
+  .field:last-of-type{ margin-bottom:10px; }
+  .field .head{
+    display:flex; justify-content:space-between;
+    align-items:baseline; margin-bottom:7px;
+  }
+  .field .head .v{ font-family:var(--mono); font-size:13px; color:var(--accent); }
+
+  input[type=range]{
+    -webkit-appearance:none; appearance:none;
+    width:100%; height:22px; background:transparent;
+  }
+  input[type=range]::-webkit-slider-runnable-track{
+    height:2px; background:var(--line-strong); border-radius:2px;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:20px; height:20px; margin-top:-9px;
+    border-radius:50%;
+    background:#0A1318;
+    border:1.5px solid var(--accent);
+    box-shadow:0 0 0 4px rgba(77,216,230,0.10);
+  }
+  input[type=range]:focus-visible::-webkit-slider-thumb{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  .row{ display:flex; gap:7px; }
+
+  button{
+    flex:1;
+    font-family:var(--sans);
+    font-size:11px; font-weight:600;
+    letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--text);
+    background:rgba(255,255,255,0.05);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 6px;
+    cursor:pointer;
+  }
+  button:active{ background:rgba(77,216,230,0.16); }
+  button.on{ background:rgba(77,216,230,0.18); border-color:var(--accent); color:var(--accent); }
+  button:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  /* ---- advanced drawer ---- */
+  #adv{ display:none; border-top:1px solid var(--line); margin-top:12px; padding-top:12px; }
+  #adv.open{ display:block; }
+  #adv .note{ font-size:10.5px; color:var(--dim); line-height:1.45; margin-top:2px; }
+
+  /* ---- start / error overlay ---- */
+  #gate{
+    position:fixed; inset:0; z-index:20;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:20px; padding:32px;
+    background:#04070A;
+    text-align:center;
+  }
+  #gate h1{
+    font-size:15px; font-weight:600;
+    letter-spacing:0.24em; text-transform:uppercase;
+  }
+  #gate p{ font-size:13px; line-height:1.6; color:var(--dim); max-width:30ch; }
+  #gate code{ font-family:var(--mono); font-size:12px; color:var(--accent); }
+  #gate button{ flex:0; padding:13px 30px; font-size:12px; }
+  #gate .rule{ width:44px; height:1px; background:var(--line-strong); }
+
+  .hidden{ display:none !important; }
+
+  #ui.away{ opacity:0; pointer-events:none; }
+  #ui{ transition:opacity 180ms ease; }
+  @media (prefers-reduced-motion: reduce){ #ui{ transition:none; } }
+
+  #tapHint{
+    position:fixed; bottom:calc(env(safe-area-inset-bottom) + 14px);
+    left:0; right:0; text-align:center; z-index:4;
+    font-size:10px; letter-spacing:0.16em; text-transform:uppercase;
+    color:rgba(255,255,255,0.4);
+    text-shadow:0 1px 6px rgba(0,0,0,0.8);
+  }
+</style>
+</head>
+<body>
+
+<video id="feed" playsinline muted autoplay></video>
+
+<div id="ui">
+  <div id="readout" class="panel">
+    <div class="cell">
+      <span class="eyebrow">Source</span>
+      <span class="val num" id="rSrc">—</span>
+    </div>
+    <div class="cell">
+      <span class="eyebrow">Magnification</span>
+      <span class="val num" id="rMag">—</span>
+    </div>
+    <div class="cell">
+      <span class="eyebrow">Sharpness</span>
+      <span class="val num" id="rSharp">—</span>
+    </div>
+  </div>
+
+  <div id="scope" class="panel">
+    <svg viewBox="0 0 100 70" aria-label="Portion of the camera frame in use">
+      <rect x="1" y="1" width="98" height="68" rx="2"
+            fill="rgba(255,255,255,0.04)" stroke="rgba(168,214,228,0.30)" stroke-width="1"/>
+      <line x1="50" y1="30" x2="50" y2="40" stroke="rgba(168,214,228,0.30)" stroke-width="0.75"/>
+      <line x1="45" y1="35" x2="55" y2="35" stroke="rgba(168,214,228,0.30)" stroke-width="0.75"/>
+      <rect id="cropBox" x="40" y="25" width="20" height="20"
+            fill="rgba(77,216,230,0.14)" stroke="#4DD8E6" stroke-width="1.25"/>
+    </svg>
+    <div class="cap">
+      <span class="eyebrow">In use</span>
+      <span class="pct" id="rPct">—</span>
+    </div>
+  </div>
+
+  <div id="controls" class="panel">
+    <div class="field">
+      <div class="head">
+        <span class="eyebrow">Viewing distance</span>
+        <span class="v"><span id="vDist">40</span> cm</span>
+      </div>
+      <input type="range" id="dist" min="15" max="90" step="1" value="40">
+    </div>
+
+    <div class="field">
+      <div class="head">
+        <span class="eyebrow">Tilt response</span>
+        <span class="v"><span id="vTilt">0.0</span></span>
+      </div>
+      <input type="range" id="tilt" min="-1" max="1" step="0.05" value="0">
+    </div>
+
+    <div class="row">
+      <button id="bTilt">Use tilt</button>
+      <button id="bAdv">Calibrate</button>
+      <button id="bHide">Hide</button>
+    </div>
+
+    <div id="adv">
+      <div class="field">
+        <div class="head">
+          <span class="eyebrow">Screen width</span>
+          <span class="v"><span id="vW">66</span> mm</span>
+        </div>
+        <input type="range" id="sw" min="45" max="90" step="0.5" value="66">
+      </div>
+      <div class="field">
+        <div class="head">
+          <span class="eyebrow">Camera field of view</span>
+          <span class="v"><span id="vF">73.7</span>°</span>
+        </div>
+        <input type="range" id="fov" min="40" max="120" step="0.5" value="73.7">
+      </div>
+      <div class="field">
+        <div class="head">
+          <span class="eyebrow">Lens offset — across</span>
+          <span class="v"><span id="vOX">0</span> mm</span>
+        </div>
+        <input type="range" id="ox" min="-40" max="40" step="1" value="0">
+      </div>
+      <div class="field">
+        <div class="head">
+          <span class="eyebrow">Lens offset — up</span>
+          <span class="v"><span id="vOY">0</span> mm</span>
+        </div>
+        <input type="range" id="oy" min="-70" max="70" step="1" value="0">
+      </div>
+      <p class="note">Hold the phone at the distance on the slider, then nudge screen width until a straight edge behind the phone lines up with the same edge on screen.</p>
+    </div>
+  </div>
+</div>
+
+<p id="tapHint" class="hidden">Tap to show controls</p>
+
+<div id="gate">
+  <h1>Window</h1>
+  <div class="rule"></div>
+  <p id="gateMsg">Points the rear camera through the screen and crops it to what your eye would actually see through a hole this size.</p>
+  <button id="bStart">Start camera</button>
+  <p id="gateHint" style="font-size:11px"></p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var video   = document.getElementById('feed');
+  var gate    = document.getElementById('gate');
+  var gateMsg = document.getElementById('gateMsg');
+  var gateHint= document.getElementById('gateHint');
+  var ui      = document.getElementById('ui');
+  var tapHint = document.getElementById('tapHint');
+  var cropBox = document.getElementById('cropBox');
+
+  var state = {
+    distCm: 40,
+    tilt: 0,
+    screenWmm: 66,
+    fovDeg: 73.7,
+    offXmm: 0,
+    offYmm: 0
+  };
+
+  var vw = 0, vh = 0;              // intrinsic video size
+  var base = null;                 // gyro zero point
+  var dBeta = 0, dGamma = 0;       // live tilt deltas, radians
+  var uiVisible = true;
+
+  var rad = function(d){ return d * Math.PI / 180; };
+  var clamp = function(v, lo, hi){ return v < lo ? lo : (v > hi ? hi : v); };
+
+  /* Estimate physical screen width. Modern iPhones sit near 460 ppi; the
+     Calibrate drawer exists because this is only ever an opening guess. */
+  function guessScreenWidth(){
+    var dpr = window.devicePixelRatio || 2;
+    var cssW = Math.min(screen.width, screen.height);
+    var mm = (cssW * dpr / 460) * 25.4;
+    return clamp(Math.round(mm * 2) / 2, 45, 90);
+  }
+
+  function recompute(){
+    if(!vw || !vh) return;
+
+    var sw = window.innerWidth, sh = window.innerHeight;
+    var dpr = window.devicePixelRatio || 1;
+
+    // object-fit:cover has already scaled the video to blanket the screen.
+    var cover = Math.max(sw / vw, sh / vh);
+
+    // Split the quoted diagonal-ish FOV across the frame's two axes.
+    var fovLong = rad(state.fovDeg), fovX, fovY;
+    if(vw >= vh){
+      fovX = fovLong;
+      fovY = 2 * Math.atan(Math.tan(fovLong / 2) * vh / vw);
+    } else {
+      fovY = fovLong;
+      fovX = 2 * Math.atan(Math.tan(fovLong / 2) * vw / vh);
+    }
+
+    // How much of the world the screen aperture subtends from the eye.
+    var wmm = state.screenWmm;
+    var hmm = wmm * sh / sw;
+    var d   = state.distCm * 10;
+    var thX = Math.atan((wmm / 2) / d);
+    var thY = Math.atan((hmm / 2) / d);
+
+    // Rectilinear lens: image position goes with tan(angle), so the source
+    // pixels we need are that ratio of tangents.
+    var needX = vw * Math.tan(thX) / Math.tan(fovX / 2);
+    var needY = vh * Math.tan(thY) / Math.tan(fovY / 2);
+
+    var scale = Math.max((sw / needX) / cover, (sh / needY) / cover);
+
+    // Tilt: assume the head holds still while the phone rotates, so the
+    // crop window travels against the rotation.
+    var dispW = vw * cover * scale, dispH = vh * cover * scale;
+    var tx = 0, ty = 0;
+    if(state.tilt !== 0 && base){
+      tx += state.tilt * dispW * Math.tan(clamp(dGamma, -0.6, 0.6)) / (2 * Math.tan(fovX / 2));
+      ty += state.tilt * dispH * Math.tan(clamp(dBeta,  -0.6, 0.6)) / (2 * Math.tan(fovY / 2));
+    }
+
+    // Fixed lens-offset correction, in screen pixels.
+    var pxPerMm = sw / wmm;
+    tx += state.offXmm * pxPerMm;
+    ty += state.offYmm * pxPerMm;
+
+    // Never pan far enough to expose the frame edge.
+    var maxX = Math.max(0, (dispW - sw) / 2);
+    var maxY = Math.max(0, (dispH - sh) / 2);
+    tx = clamp(tx, -maxX, maxX);
+    ty = clamp(ty, -maxY, maxY);
+
+    video.style.transform =
+      'translate(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px) scale(' + scale.toFixed(4) + ')';
+
+    /* ---- readouts ---- */
+    var fx = clamp(needX / vw, 0.01, 1);
+    var fy = clamp(needY / vh, 0.01, 1);
+
+    cropBox.setAttribute('width',  (98 * fx).toFixed(2));
+    cropBox.setAttribute('height', (68 * fy).toFixed(2));
+    cropBox.setAttribute('x', (1 + 49 - 49 * fx).toFixed(2));
+    cropBox.setAttribute('y', (1 + 34 - 34 * fy).toFixed(2));
+
+    var areaPct = fx * fy * 100;
+    document.getElementById('rPct').textContent =
+      areaPct < 1 ? areaPct.toFixed(2) + '%' : areaPct.toFixed(1) + '%';
+
+    document.getElementById('rSrc').textContent = vw + '\u00D7' + vh;
+    document.getElementById('rMag').textContent = scale.toFixed(1) + '\u00D7';
+
+    // Source pixels per device pixel across the screen. Under 1.0 = upscaling.
+    var sharp = needX / (sw * dpr);
+    var el = document.getElementById('rSharp');
+    el.textContent = sharp.toFixed(2) + '\u00D7';
+    el.className = 'val num' + (sharp < 1 ? ' flag' : '');
+  }
+
+  /* ---- camera ---- */
+  async function start(){
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      fail('No camera API here.',
+           location.protocol === 'https:' ? '' : 'Needs an https:// origin — file:// and plain http won\u2019t do.');
+      return;
+    }
+    try{
+      var stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          facingMode: { ideal: 'environment' },
+          // Ask high: the crop throws away most of the frame, so resolution
+          // is the whole budget for how sharp the illusion looks.
+          width:  { ideal: 3840 },
+          height: { ideal: 2160 },
+          frameRate: { ideal: 30 }
+        }
+      });
+      video.srcObject = stream;
+      await video.play();
+
+      var settle = function(){
+        vw = video.videoWidth; vh = video.videoHeight;
+        if(vw && vh){ recompute(); }
+      };
+      video.addEventListener('loadedmetadata', settle);
+      video.addEventListener('resize', settle);
+      settle();
+
+      gate.classList.add('hidden');
+    }catch(err){
+      fail('Camera unavailable.',
+           err && err.name === 'NotAllowedError'
+             ? 'Permission was declined. Reload and allow camera access.'
+             : (err && err.message) || '');
+    }
+  }
+
+  function fail(msg, hint){
+    gateMsg.textContent = msg;
+    gateHint.textContent = hint || '';
+    gate.classList.remove('hidden');
+  }
+
+  /* ---- gyro ---- */
+  function onOrient(e){
+    if(e.beta === null || e.gamma === null) return;
+    if(!base){ base = { beta: e.beta, gamma: e.gamma }; }
+    dBeta  = rad(e.beta  - base.beta);
+    dGamma = rad(e.gamma - base.gamma);
+    recompute();
+  }
+
+  async function enableTilt(){
+    var btn = document.getElementById('bTilt');
+    if(base){                       // already running — re-zero to here
+      base = null; dBeta = dGamma = 0;
+      btn.textContent = 'Re-zero';
+      return;
+    }
+    try{
+      var DOE = window.DeviceOrientationEvent;
+      if(DOE && typeof DOE.requestPermission === 'function'){
+        var res = await DOE.requestPermission();
+        if(res !== 'granted'){ btn.textContent = 'Denied'; return; }
+      }
+      window.addEventListener('deviceorientation', onOrient);
+      btn.classList.add('on');
+      btn.textContent = 'Re-zero';
+      if(state.tilt === 0){ setTilt(0.5); }
+    }catch(_){
+      btn.textContent = 'No sensor';
+    }
+  }
+
+  function setTilt(v){
+    state.tilt = v;
+    document.getElementById('tilt').value = v;
+    document.getElementById('vTilt').textContent = v.toFixed(1);
+    recompute();
+  }
+
+  /* ---- wiring ---- */
+  function bind(id, label, key, fmt){
+    var input = document.getElementById(id);
+    var out = document.getElementById(label);
+    input.addEventListener('input', function(){
+      state[key] = parseFloat(input.value);
+      out.textContent = fmt ? fmt(state[key]) : input.value;
+      recompute();
+    });
+  }
+
+  bind('dist', 'vDist', 'distCm');
+  bind('sw',   'vW',    'screenWmm');
+  bind('fov',  'vF',    'fovDeg');
+  bind('ox',   'vOX',   'offXmm');
+  bind('oy',   'vOY',   'offYmm');
+  document.getElementById('tilt').addEventListener('input', function(){
+    setTilt(parseFloat(this.value));
+  });
+
+  document.getElementById('bStart').addEventListener('click', start);
+  document.getElementById('bTilt').addEventListener('click', enableTilt);
+
+  document.getElementById('bAdv').addEventListener('click', function(){
+    var open = document.getElementById('adv').classList.toggle('open');
+    this.classList.toggle('on', open);
+  });
+
+  function toggleUI(){
+    uiVisible = !uiVisible;
+    ui.classList.toggle('away', !uiVisible);
+    tapHint.classList.toggle('hidden', uiVisible);
+  }
+  document.getElementById('bHide').addEventListener('click', toggleUI);
+  video.addEventListener('click', function(){ if(!uiVisible) toggleUI(); });
+  tapHint.addEventListener('click', function(){ if(!uiVisible) toggleUI(); });
+
+  window.addEventListener('resize', recompute);
+  window.addEventListener('orientationchange', function(){ setTimeout(recompute, 350); });
+
+  // Opening estimate for screen width.
+  state.screenWmm = guessScreenWidth();
+  document.getElementById('sw').value = state.screenWmm;
+  document.getElementById('vW').textContent = state.screenWmm;
+
+  if(location.protocol !== 'https:' && location.hostname !== 'localhost'){
+    gateHint.textContent = 'Serve this over https:// — Safari blocks the camera otherwise.';
+  }
+})();
+</script>
+</body>
+</html>
