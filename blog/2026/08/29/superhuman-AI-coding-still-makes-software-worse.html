@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SPPPPB9KSW"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){ dataLayer.push(arguments); }
+gtag('js', new Date());
+gtag('config', 'G-SPPPPB9KSW');
+</script>
+<meta name="Description" content="Description">
+<meta property="og:title" content="Superhuman AI coding still makes software worse">
+<meta property="og:description" content="Description">
+<meta property="og:image" content="https://www.williamangel.net/blog/2026/08/29/image.png">
+<meta property="og:url" content="https://www.williamangel.net/blog/2026/08/29/superhuman-AI-coding-still-makes-software-worse.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="https://www.williamangel.net">
+<meta name="twitter:creator" content="@DataDrivenAngel">
+<meta name="twitter:title" content="Superhuman AI coding still makes software worse">
+<meta name="twitter:description" content="Description">
+<meta name="twitter:image" content="https://www.williamangel.net/blog/2026/08/29/image.png">
+<title>Superhuman AI coding still makes software worse</title>
+<link rel="stylesheet" type="text/css" href="/css/main.css">
+<link rel="alternate" type="application/rss+xml" title="Will Angel's Blog" href="/rss.xml">
+</head>
+<body>
+<style>
+.cookie-popup-overlay {
+	display: none;
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	z-index: 9999;
+	animation: slideInFromBottom 0.4s ease-out;
+}
+.cookie-popup {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	padding: 15px 20px;
+	border-radius: 12px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+	text-align: center;
+	max-width: 280px;
+	position: relative;
+}
+.cookie-icon {
+	font-size: 32px;
+	margin-bottom: 8px;
+	animation: bounce 1s infinite;
+}
+.cookie-popup h2 {
+	color: white;
+	font-family: 'Helvetica', 'Arial', 'Sans-Serif';
+	font-size: 0.95em;
+	margin: 0 0 10px 0;
+}
+.cookie-popup-button {
+	display: inline-block;
+	background-color: #ffd700;
+	color: #333;
+	padding: 8px 20px;
+	border-radius: 50px;
+	text-decoration: none;
+	font-family: 'Helvetica', 'Arial', 'Sans-Serif';
+	font-weight: bold;
+	font-size: 0.9em;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+.cookie-popup-button:hover {
+	background-color: #ffed4e;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(255, 215, 0, 0.6);
+}
+.cookie-popup-close {
+	position: absolute;
+	top: 8px;
+	right: 10px;
+	color: white;
+	font-size: 20px;
+	cursor: pointer;
+	background: none;
+	border: none;
+	opacity: 0.7;
+	transition: opacity 0.3s ease;
+	line-height: 1;
+}
+.cookie-popup-close:hover {
+	opacity: 1;
+}
+.cookie-popup p {
+	color: white;
+	font-family: 'Helvetica', 'Arial', 'Sans-Serif';
+	font-size: 0.75em;
+	margin: 8px 0 0 0;
+	opacity: 0.9;
+}
+@keyframes slideInFromBottom {
+	from { transform: translateY(100px); opacity: 0; }
+	to { transform: translateY(0); opacity: 1; }
+}
+@keyframes bounce {
+	0%, 100% { transform: translateY(0); }
+	50% { transform: translateY(-5px); }
+}
+</style>
+<div class="cookie-popup-overlay" id="cookiePopupOverlay">
+<div class="cookie-popup">
+<button class="cookie-popup-close" onclick="closeCookiePopup()">&times;</button>
+<div class="cookie-icon">🍪</div>
+<h2>Play my cookie clicker game!</h2>
+<a href="/clicker/game/index.html" class="cookie-popup-button">Let's Play!</a>
+<p>Also this website uses google analytics</p>
+</div>
+</div>
+<nav>
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/about">About</a></li>
+<li><a href="/book">Book</a></li>
+<li><a href="/blog">Blog</a></li>
+</ul>
+</nav>
+<main>
+<div class="container">
+<p class="post-tags" aria-label="Tags"><span>Tags: </span><a class="post-tag" href="/blog/?tag=ai">AI</a>, <a class="post-tag" href="/blog/?tag=llms">LLMs</a>, <a class="post-tag" href="/blog/?tag=agents">Agents</a>, <a class="post-tag" href="/blog/?tag=local-models">Local models</a>, <a class="post-tag" href="/blog/?tag=ollama">Ollama</a>, <a class="post-tag" href="/blog/?tag=coding">Coding</a></p><h1>Superhuman AI coding still makes software worse.</h1>
+<p>![[2026-08-29-defect-rate.png]]</p>
+<p>AI is probably better than humans at writing code now.</p>
+<p>But skill at coding is not exactly the same thing as skill at developing and maintaining software, and while AI can help there as well, a swarm of cowboy coder agents will get you to a legacy codebase which is hard to support and maintain very very quickly.</p>
+<p>I believe this is for three reasons:</p>
+<ol>
+<li>The math of defect rates and velocity.</li>
+<li>Model collapse</li>
+<li>Context limits</li>
+</ol>
+<h2>The math of defect rates</h2>
+<p>Some percent of changes we make will be defective. Human teams range from 5% to over 30%.  (https://getdx.com/blog/change-failure-rate/)</p>
+<p>If AI codes faster than us, at the same level of quality / defect rate, that means we get more bugs!</p>
+<p>`Changes x defects/change = defects</p>
+<p>This is true even if the AI is better than most humans, the speed means that you still get more defects and issues!</p>
+<p>If a human developer has a change failure rate of say 10%, (1 in 10 changes causes a defect or issue), and AI is twice as good and only introduces bugs 5% of the time, but submits 10x as many changes, then you go from 1 bug per unit of time to 5 bugs per unit of time, so your velocity is up 10x but your defect rate is up 5x...</p>
+<p>Now this assumes that the AI is better and not just faster.</p>
+<p>if AI is faster and writes code that has a higher defect rate, then those numbers are worse. say the AI writes code that has twice the defect rate of humans on average, at 2x the speed, then our velocity is up 2x but our defect rate is up 4x!</p>
+<p>For writing disposable software, this is fine and I do believe that we&#x27;ll be writing tens or hundreds of times as much code as we were before, but the amount of code worth keeping is lower, and it still takes time and wrangling to keep the quality at a human level.  Humans struggle to keep code quality high, and with AI it&#x27;ll be harder.</p>
+<p>AI can fix bugs as well, but if it makes 5x the bugs, then that reduces the productivity!</p>
+<h2>Model collapse</h2>
+<p>Model collapse is when a machine learning model is trained on synthetic data generated by another model. I believe that a form of this can happen in AI generated code bases, where the more of a codebase is AI generated the more likely it is that the model will start losing coherence as it tries to make changes. The text/token patterns become too self referential and the model is less able to make changes.</p>
+<h2>Context limits</h2>
+<p>As a software codebase grows in complexity and size, it takes more context / memory for an AI or human to understand enough to make changes. Humans and AI alike struggle to make changes on bigger systems, so as a system grows it becomes harder to grow further. This inclines all software projects to trend towards becoming a buggy mess, and AI gets us there faster.</p>
+</div>
+</main>
+<nav class="blog-nav">
+  <a href="/blog/2026/07/08/OpenCode-Bug-I-did-not-say-that-you-did.html">&larr; I did not say that, you did</a>
+  <span></span>
+</nav>
+<footer>
+<ul>
+<li><a href="https://twitter.com/DataDrivenAngel">Twitter</a></li>
+<li><a href="https://www.linkedin.com/in/william-angel/">LinkedIn</a></li>
+<li><a href="https://github.com/DataDrivenAngel">GitHub</a></li>
+</ul>
+</footer>
+<script>
+function checkFirstVisit() {
+    const hasVisited = localStorage.getItem('hasVisitedBefore');
+    if (!hasVisited) {
+        setTimeout(() => {
+            document.getElementById('cookiePopupOverlay').style.display = 'block';
+        }, 500);
+    }
+}
+function closeCookiePopup() {
+    document.getElementById('cookiePopupOverlay').style.display = 'none';
+    localStorage.setItem('hasVisitedBefore', 'true');
+}
+window.addEventListener('load', checkFirstVisit);
+</script>
+</body>
+</html>
