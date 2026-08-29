@@ -14,9 +14,9 @@
       <link>https://www.williamangel.net/blog/2026/08/29/superhuman-AI-coding-still-makes-software-worse.html</link>
       <guid isPermaLink="true">https://www.williamangel.net/blog/2026/08/29/superhuman-AI-coding-still-makes-software-worse.html</guid>
       <pubDate>Sat, 29 Aug 2026 00:00:00 +0000</pubDate>
-      <description>Description</description>
+      <description>AI can increase the overall number of bugs even if it writes better code than humans.</description>
       <content:encoded><![CDATA[<h1>Superhuman AI coding still makes software worse.</h1>
-<p>![[2026-08-29-defect-rate.png]]</p>
+<p>![2026-08-29-defect-rate.png]</p>
 <p>AI is probably better than humans at writing code now.</p>
 <p>But skill at coding is not exactly the same thing as skill at developing and maintaining software, and while AI can help there as well, a swarm of cowboy coder agents will get you to a legacy codebase which is hard to support and maintain very very quickly.</p>
 <p>I believe this is for three reasons:</p>
