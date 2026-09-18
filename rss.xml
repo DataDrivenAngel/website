@@ -7,8 +7,22 @@
     <link>https://www.williamangel.net/blog/</link>
     <description>Posts from williamangel.net</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 29 Aug 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 18 Sep 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://www.williamangel.net/rss.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>I cancelled my personal Claude subscription</title>
+      <link>https://www.williamangel.net/blog/2026/09/18/i-cancelled-my-claude-subscription.html</link>
+      <guid isPermaLink="true">https://www.williamangel.net/blog/2026/09/18/i-cancelled-my-claude-subscription.html</guid>
+      <pubDate>Fri, 18 Sep 2026 00:00:00 +0000</pubDate>
+      <description>The writing got too bad.</description>
+      <content:encoded><![CDATA[<h1>I cancelled my personal Claude subscription</h1>
+<p>Like this guy, Claude won&#x27;t shut up.<br>
+<img src="corvid.png" alt="Claude won&#x27;t shut up"></p>
+<p>I cancelled my Anthropic subscription yesterday even though Claude Code is awesome.</p>
+<p>Except it sucks at writing and communicating, and has been getting worse since around April. See <a href="https://louisabraham.github.io/load-bearing/">the load bearing vocabulary</a> for some quantitative examples.</p>
+<p>Specifically, the vocabulary and linguistic structure that Claude drifts towards is mentally taxing to read and that makes Claude less helpful per unit of energy and time spent using Claude. Claude has gotten worse in this regard, and other options are almost as good and can be less verbose. All LLM writing is mediocre at best, but some of it is at least boring and straightforward. I do not want to read claudish.</p>
+<p>Catch me using Kilo and open models for the near future.</p>]]></content:encoded>
+    </item>
     <item>
       <title>Superhuman AI coding still makes software worse</title>
       <link>https://www.williamangel.net/blog/2026/08/29/superhuman-AI-coding-still-makes-software-worse.html</link>
